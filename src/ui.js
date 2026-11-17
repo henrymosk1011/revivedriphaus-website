@@ -88,6 +88,9 @@ function initMenuFilters() {
       cards.forEach((c) => {
         const show = f === 'all' || c.dataset.tag === f;
         c.classList.toggle('is-hidden', !show);
+        // the visitor is interacting: show cards immediately, skip any pending reveal
+        c.style.opacity = '';
+        c.style.transform = '';
       });
       window.dispatchEvent(new Event('resize'));
     })

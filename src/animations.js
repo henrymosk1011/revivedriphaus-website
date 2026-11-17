@@ -66,16 +66,20 @@ export function initAnimations({ reduceMotion }) {
     scrollTrigger: { trigger: '.arrive__lower', start: 'top 98%', end: 'top 50%', scrub: true },
   });
 
-  // Stats and drip cards cascade in.
+  // Stats and drip cards cascade in. Transforms are cleared afterwards so
+  // CSS hover states keep working.
+  gsap.set('.stat', { opacity: 0, y: 40, scale: 0.96 });
   ScrollTrigger.batch('.stat', {
-    start: 'top 90%',
-    onEnter: (batch) => gsap.from(batch, { opacity: 0, y: 40, scale: 0.96, duration: 1.2, ease: EASE, stagger: 0.08 }),
-    once: true,
-  });
-  ScrollTrigger.batch('.drip', {
     start: 'top 92%',
     onEnter: (batch) =>
-      gsap.from(batch, { opacity: 0, y: 70, rotateX: -12, transformOrigin: '50% 100%', duration: 1.3, ease: EASE, stagger: 0.07 }),
+      gsap.to(batch, { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: EASE, stagger: 0.08, clearProps: 'transform' }),
+    once: true,
+  });
+  gsap.set('.drip', { opacity: 0, y: 70, rotateX: -12, transformOrigin: '50% 100%' });
+  ScrollTrigger.batch('.drip', {
+    start: 'top 94%',
+    onEnter: (batch) =>
+      gsap.to(batch, { opacity: 1, y: 0, rotateX: 0, duration: 1.3, ease: EASE, stagger: 0.07, clearProps: 'transform' }),
     once: true,
   });
 

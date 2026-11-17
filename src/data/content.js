@@ -21,6 +21,7 @@ export const ingredients = {
   },
   bcomplex: {
     name: 'Vitamin B Complex',
+    // REVIEW: summary line added for the ingredient pop-up; the list below is from the live site.
     text: 'The full family of B vitamins for energy, nerves, skin and blood.',
     list: [
       ['B1 (Thiamine)', 'Supports energy metabolism, nerve function, and brain health.'],

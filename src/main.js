@@ -79,8 +79,9 @@ async function boot() {
   try {
     const { Film } = await import('./scene/Film.js');
     setProgress(0.3);
-    film = new Film(document.getElementById('film'), { reduceMotion, capture });
-    await film.init(setProgress);
+    const f = new Film(document.getElementById('film'), { reduceMotion, capture });
+    await f.init(setProgress);
+    film = f; // only hand the film to the render loop once it is fully built
   } catch (err) {
     console.error('[film] failed to start, falling back to static background', err);
     film = null;

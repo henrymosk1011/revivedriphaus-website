@@ -83,7 +83,7 @@ export class City {
           float carsZ = step(d.x, 0.45) * pow(fract(-p.y * 0.045 + uTime * (0.3 + fract(colI * 0.61) * 0.4) + colI * 0.61), 24.0);
           col += vec3(1.0, 0.82, 0.55) * carsX * 1.6 + vec3(0.55, 1.0, 0.72) * carsZ * 1.3;
           float dh = length(p - uHead.xz);
-          col += vec3(0.3, 1.0, 0.55) * uHeadAmt * (exp(-dh * 0.2) * 0.9 + exp(-dh * 0.05) * 0.05);
+          col += vec3(0.3, 1.0, 0.55) * uHeadAmt * (exp(-dh * 0.28) * 0.45 + exp(-dh * 0.06) * 0.03);
           gl_FragColor = vec4(applyFog(col, vWorld), 1.0);
         }`,
     });
@@ -193,7 +193,7 @@ export class City {
           vec3 toH = uHead - vWorld;
           float dH = length(toH);
           float facing = max(dot(n, toH / max(dH, 0.001)), 0.0);
-          col += vec3(0.35, 1.0, 0.6) * uHeadAmt * facing * 6.0 / (1.0 + dH * dH * 0.12);
+          col += vec3(0.35, 1.0, 0.6) * uHeadAmt * facing * 1.8 / (1.0 + dH * dH * 0.16);
           gl_FragColor = vec4(applyFog(col, vWorld), 1.0);
         }`,
     });

@@ -949,12 +949,11 @@ section {
   padding: 24px;
   overflow: hidden;
   transition:
-    transform 0.6s var(--ease-out),
-    border-color 0.4s,
-    opacity 0.4s;
+    translate 0.6s var(--ease-out),
+    border-color 0.4s;
 }
 .drip:hover {
-  transform: translateY(-4px);
+  translate: 0 -4px;
   border-color: var(--line-2);
 }
 .drip.is-hidden {
