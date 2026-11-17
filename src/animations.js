@@ -11,7 +11,7 @@ export function playIntro({ reduceMotion }) {
   const tl = gsap.timeline({ delay: 0.15 });
   tl.from('.hero__title .line > span', { yPercent: 110, duration: 1.5, ease: EASE, stagger: 0.11 })
     .from('.hero [data-reveal]', { opacity: 0, y: 26, duration: 1.2, ease: EASE, stagger: 0.08 }, 0.35)
-    .from('.hero__meta > *', { opacity: 0, y: 12, duration: 1, ease: EASE, stagger: 0.06 }, 0.6)
+    .from('.spec > div', { opacity: 0, y: 12, duration: 1, ease: EASE, stagger: 0.06 }, 0.6)
     .from('.nav', { opacity: 0, y: -20, duration: 1.1, ease: EASE }, 0.2);
 }
 
@@ -48,7 +48,7 @@ export function initAnimations({ reduceMotion }) {
     el.classList.add('is-split');
     gsap.fromTo(
       split.words,
-      { opacity: 0.45 }, // never fades below a legible contrast
+      { opacity: 0.6 }, // never fades below a legible contrast
       {
         opacity: 1,
         ease: 'none',
@@ -58,12 +58,12 @@ export function initAnimations({ reduceMotion }) {
     );
   });
 
-  // The "We come to you" headline holds while the city plays, then dissolves.
-  gsap.to('.arrive__sticky', {
+  // "We come to you" holds while the drop forms and falls, then dissolves.
+  gsap.to('.drop__sticky', {
     opacity: 0,
     y: -60,
     ease: 'none',
-    scrollTrigger: { trigger: '.arrive__lower', start: 'top 78%', end: 'top 52%', scrub: true },
+    scrollTrigger: { trigger: '.drop__lower', start: 'top 78%', end: 'top 52%', scrub: true },
   });
 
   // Stats and drip cards cascade in. Transforms are cleared afterwards so
@@ -75,11 +75,22 @@ export function initAnimations({ reduceMotion }) {
       gsap.to(batch, { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: EASE, stagger: 0.08, clearProps: 'transform' }),
     once: true,
   });
-  gsap.set('.drip', { opacity: 0, y: 70, rotateX: -12, transformOrigin: '50% 100%' });
+  // IV-bag cards drop onto their hooks with a little swing; the fluid fills.
+  gsap.set('.drip', { opacity: 0, y: -50, rotate: -3, transformOrigin: '50% 0%' });
+  gsap.set('.drip__fluid', { height: '0%' });
   ScrollTrigger.batch('.drip', {
     start: 'top 94%',
-    onEnter: (batch) =>
-      gsap.to(batch, { opacity: 1, y: 0, rotateX: 0, duration: 1.3, ease: EASE, stagger: 0.07, clearProps: 'transform' }),
+    onEnter: (batch) => {
+      gsap.to(batch, { opacity: 1, y: 0, rotate: 0, duration: 1.4, ease: 'elastic.out(1, 0.55)', stagger: 0.08, clearProps: 'transform,rotate' });
+      gsap.to(batch.map((el) => el.querySelector('.drip__fluid')), {
+        height: (_, el) => `${parseFloat(el.closest('.drip').style.getPropertyValue('--level')) * 100}%`,
+        duration: 2.2,
+        ease: 'power2.out',
+        stagger: 0.08,
+        delay: 0.2,
+        clearProps: 'height',
+      });
+    },
     once: true,
   });
 

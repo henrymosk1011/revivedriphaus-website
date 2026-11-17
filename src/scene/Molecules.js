@@ -75,7 +75,7 @@ function generate(rand) {
 }
 
 export class Molecules {
-  constructor({ center, count = 9, spread = [30, 14, 150] } = {}) {
+  constructor({ center, count = 9, spread = [30, 14, 150], palette = null, glow = 0.55, bondColor = '#b9e9cf' } = {}) {
     this.group = new THREE.Group();
     this.group.position.copy(center);
     const rand = rng(424242);
@@ -102,12 +102,12 @@ export class Molecules {
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
          #ifdef USE_COLOR
-           totalEmissiveRadiance += vColor.rgb * vColor.rgb * 0.55;
+           totalEmissiveRadiance += vColor.rgb * vColor.rgb * ${glow.toFixed(3)};
          #endif`
       );
     };
     const bondMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#b9e9cf'),
+      color: new THREE.Color(bondColor),
       roughness: 0.25,
       metalness: 0.7,
       envMapIntensity: 1.2,
@@ -128,7 +128,7 @@ export class Molecules {
         const spec = ATOMS[a.type];
         m4.compose(a.pos, q.identity(), s.setScalar(spec.r));
         am.setMatrixAt(k, m4);
-        am.setColorAt(k, new THREE.Color(spec.color));
+        am.setColorAt(k, new THREE.Color(palette?.[a.type] ?? spec.color));
       });
       const bm = new THREE.InstancedMesh(cyl, bondMat, bonds.length);
       bonds.forEach(([a, b], k) => {

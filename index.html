@@ -10,7 +10,7 @@
     />
     <link rel="canonical" href="%SITE_URL%/" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
-    <meta name="theme-color" content="#03100a" />
+    <meta name="theme-color" content="#f2f6f3" />
     <meta name="format-detection" content="telephone=yes" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
@@ -28,7 +28,7 @@
     <meta property="og:image" content="%SITE_URL%/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Revive Drip Haus: on-demand mobile IV hydration" />
+    <meta property="og:image:alt" content="A glossy IV bag of green hydration fluid labelled Revive Drip Haus" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Revive Drip Haus | Mobile IV Hydration, Straight to You" />
     <meta name="twitter:description" content="On-demand IV hydration across LA, Ventura &amp; OC. Open 24/7." />
@@ -49,8 +49,7 @@
     <!-- Navigation ------------------------------------------------------- -->
     <header class="nav" id="nav">
       <a class="brand" href="#top">
-        <img class="brand__avatar" src="/media/nurse-avatar.png" alt="" width="123" height="139" />
-        <span class="wordmark">REV<b>IV</b>E <small>drip haus</small></span>
+        <img src="/media/revive-logo.png" alt="Revive Drip Haus" width="444" height="152" />
         <span class="sr-only">, back to top</span>
       </a>
       <nav class="nav__links" aria-label="Main">
@@ -80,67 +79,74 @@
       </div>
     </div>
 
-    <!-- Film HUD: scrolling is the play button --------------------------- -->
+    <!-- Film HUD: an IV line that fills as you scroll --------------------- -->
     <aside class="hud" aria-label="Animation controls and chapters">
-      <button class="hud__motion" type="button" data-motion-toggle aria-pressed="false">
-        <span class="hud__icon" aria-hidden="true"></span><span data-motion-label>Pause animation</span>
-      </button>
-      <div class="hud__state" aria-hidden="true"><span class="hud__dot"></span><span class="hud__label">Scroll to play</span></div>
-      <div class="hud__time" aria-hidden="true"><span data-hud-time>00:00</span><span class="hud__sep">/</span><span>01:00</span></div>
-      <ol class="hud__chapters" aria-label="Jump to chapter">
-        <li><button type="button" data-goto="0"><span>01</span> Arrive</button></li>
-        <li><button type="button" data-goto="1"><span>02</span> Travel</button></li>
-        <li><button type="button" data-goto="2"><span>03</span> Absorb</button></li>
-        <li><button type="button" data-goto="3"><span>04</span> Choose</button></li>
-        <li><button type="button" data-goto="4"><span>05</span> Revive</button></li>
-        <li><button type="button" data-goto="5"><span>06</span> Book</button></li>
-      </ol>
-      <div class="hud__track" aria-hidden="true"><span class="hud__fill"></span></div>
+      <div class="hud__bar">
+        <button class="hud__motion" type="button" data-motion-toggle aria-pressed="false">
+          <span class="hud__icon" aria-hidden="true"></span><span data-motion-label>Pause animation</span>
+        </button>
+        <p class="hud__meter" aria-hidden="true">
+          <span class="hud__dot"></span><span class="hud__label">Scroll to infuse</span><span>·</span><b data-hud-ml>0</b> mL
+        </p>
+      </div>
+      <nav class="dripline" aria-label="Chapters">
+        <div class="dripline__tube" aria-hidden="true"><span class="dripline__fluid"></span></div>
+        <ol class="hud__chapters">
+          <li><button type="button" data-goto="0"><span>01</span> Bag</button></li>
+          <li><button type="button" data-goto="1"><span>02</span> Drop</button></li>
+          <li><button type="button" data-goto="2"><span>03</span> Line</button></li>
+          <li><button type="button" data-goto="3"><span>04</span> Formula</button></li>
+          <li><button type="button" data-goto="4"><span>05</span> Revive</button></li>
+          <li><button type="button" data-goto="5"><span>06</span> Book</button></li>
+        </ol>
+      </nav>
     </aside>
 
     <main id="main" tabindex="-1">
-      <!-- 01 · Hero ----------------------------------------------------- -->
+      <!-- 01 · The bag --------------------------------------------------- -->
       <section class="hero" id="top" data-chapter="0">
-        <div class="hero__inner">
-          <p class="eyebrow" data-reveal>Mobile IV therapy · Los Angeles</p>
+        <div class="hero__copy">
+          <div class="hero__text scrim">
+          <p class="tag" data-reveal>Rx · Mobile IV therapy · Los Angeles</p>
           <h1 class="hero__title">
             <span class="line"><span>On-demand</span></span>
             <span class="line"><span>mobile IV</span></span>
-            <span class="line line--serif"><span><em>hydration</em></span></span>
+            <span class="line"><span><em>hydration</em></span></span>
           </h1>
-          <div class="hero__foot">
-            <p class="hero__lede" data-reveal>
-              A licensed nurse brings hydration, vitamins and recovery to your couch, office or hotel. Day or night.
-            </p>
-            <div class="hero__ctas" data-reveal>
-              <a class="btn btn--primary" href="tel:+18184829426"><!-- icon:phone --> Call (818) 482-9426</a>
-              <a class="btn btn--ghost" href="#menu">Explore the IV menu <!-- icon:arrow --></a>
+          <p class="hero__lede" data-reveal>
+            A licensed nurse brings hydration, vitamins and recovery to your couch, office or hotel. Day or night.
+          </p>
+          <div class="hero__ctas" data-reveal>
+            <a class="btn btn--primary" href="tel:+18184829426"><!-- icon:phone --> Call (818) 482-9426</a>
+            <a class="btn btn--ghost" href="#menu">Explore the IV menu <!-- icon:arrow --></a>
+          </div>
+          </div>
+        </div>
+        <dl class="spec">
+          <div><dt>Volume</dt><dd>1000 mL</dd></div>
+          <div><dt>Hours</dt><dd><i class="pulse" aria-hidden="true"></i> Open 24/7</dd></div>
+          <div><dt>Session</dt><dd>30–60 min</dd></div>
+          <div><dt>Serving</dt><dd>LA · Ventura · OC</dd></div>
+        </dl>
+      </section>
+
+      <!-- 02 · The drop -------------------------------------------------- -->
+      <section class="drop" id="come-to-you" data-chapter="1">
+        <div class="drop__sticky">
+          <div class="scrim">
+            <p class="tag">02 · The drop</p>
+            <h2 class="display" data-split>We come to you, <em>wherever</em> you are.</h2>
+            <div class="drop__copy">
+              <p class="lede" data-reveal>
+                No clinic. No waiting. Just hydration therapy delivered to your couch, office, hotel. Wherever you are.
+              </p>
+              <p data-reveal>Perfect for busy professionals, athletes, travelers &amp; more.</p>
             </div>
           </div>
         </div>
-        <div class="hero__meta">
-          <span><i class="pulse" aria-hidden="true"></i> Open 24/7</span>
-          <span>Los Angeles · Ventura · Orange County</span>
-        </div>
-      </section>
 
-      <!-- 02 · We come to you (the city) -------------------------------- -->
-      <section class="arrive" id="come-to-you" data-chapter="1">
-        <div class="arrive__sticky">
-          <p class="eyebrow">02 · Travel</p>
-          <h2 class="display arrive__title" data-split>
-            We come to you, <em>wherever</em> you are.
-          </h2>
-          <div class="arrive__copy">
-            <p class="arrive__lede" data-reveal>
-              No clinic. No waiting. Just hydration therapy delivered to your couch, office, hotel. Wherever you are.
-            </p>
-            <p data-reveal>Perfect for busy professionals, athletes, travelers &amp; more.</p>
-          </div>
-        </div>
-
-        <div class="arrive__lower">
-          <figure class="arrive__video glass" data-reveal>
+        <div class="drop__lower">
+          <figure class="video-card" data-reveal>
             <video
               src="/media/at-home-drip.mp4"
               poster="/media/at-home-drip-poster.jpg"
@@ -155,19 +161,19 @@
               <span aria-hidden="true"></span>
             </button>
           </figure>
-          <ul class="stats" data-reveal-group>
-            <li class="stat glass"><strong>24/7</strong><span>Open around the clock, including nights and weekends</span></li>
-            <li class="stat glass"><strong>30–60<small>min</small></strong><span>Typical session, then get on with your day</span></li>
-            <li class="stat glass"><strong>3</strong><span>Counties served: LA, Ventura &amp; OC</span></li>
-            <li class="stat glass"><strong>10+<small>yrs</small></strong><span>Emergency medicine &amp; critical care experience</span></li>
+          <ul class="stats">
+            <li class="stat glass"><span class="stat__k">Hours</span><strong>24/7</strong><p>Open around the clock, including nights and weekends</p></li>
+            <li class="stat glass"><span class="stat__k">Session</span><strong>30–60<small>min</small></strong><p>Typical session, then get on with your day</p></li>
+            <li class="stat glass"><span class="stat__k">Counties</span><strong>3</strong><p>Los Angeles, Ventura &amp; Orange County</p></li>
+            <li class="stat glass"><span class="stat__k">Experience</span><strong>10+<small>yrs</small></strong><p>Emergency medicine &amp; critical care</p></li>
           </ul>
         </div>
       </section>
 
-      <!-- 03 · Why it works (the bloodstream) --------------------------- -->
+      <!-- 03 · The line -------------------------------------------------- -->
       <section class="benefits" id="why" data-chapter="2">
-        <header class="section-head">
-          <p class="eyebrow">03 · Absorb</p>
+        <header class="section-head scrim">
+          <p class="tag">03 · The line</p>
           <h2 class="display" data-split>Straight to the <em>bloodstream</em></h2>
           <p class="section-head__lede" data-reveal>
             IV therapy skips the digestive system, so fluids and nutrients get to work faster. Here's why our clients
@@ -178,7 +184,7 @@
         <article class="benefit glass" data-side="left">
           <img src="/media/no-travel.webp" alt="A nurse checks on a client during an at-home IV" loading="lazy" width="1100" height="734" />
           <div class="benefit__copy">
-            <span class="benefit__num">01</span>
+            <span class="benefit__num">01 · Benefit</span>
             <h3>No travel</h3>
             <p>A nurse comes to you. No traffic, no parking drama.</p>
           </div>
@@ -186,7 +192,7 @@
         <article class="benefit glass" data-side="right">
           <img src="/media/no-waiting.webp" alt="A client resting comfortably with an IV line" loading="lazy" width="1100" height="734" />
           <div class="benefit__copy">
-            <span class="benefit__num">02</span>
+            <span class="benefit__num">02 · Benefit</span>
             <h3>No waiting</h3>
             <p>Get started as soon as your provider arrives. No more lobby lurking.</p>
           </div>
@@ -194,7 +200,7 @@
         <article class="benefit glass" data-side="left">
           <img src="/media/fast-efficient.webp" alt="A gloved nurse placing an IV" loading="lazy" width="1100" height="733" />
           <div class="benefit__copy">
-            <span class="benefit__num">03</span>
+            <span class="benefit__num">03 · Benefit</span>
             <h3>Fast &amp; efficient</h3>
             <p>30–60 min sessions to rehydrate, recover, and get on with your day.</p>
           </div>
@@ -202,7 +208,7 @@
         <article class="benefit glass" data-side="right">
           <img src="/media/multi-task.webp" alt="A client on her phone during an IV drip" loading="lazy" width="1015" height="658" />
           <div class="benefit__copy">
-            <span class="benefit__num">04</span>
+            <span class="benefit__num">04 · Benefit</span>
             <h3>Multi-task friendly</h3>
             <p>Watch Netflix, reply to emails, or nap. Your call.</p>
           </div>
@@ -210,21 +216,21 @@
         <article class="benefit glass" data-side="left">
           <img src="/media/fast-recovery.webp" alt="A woman running by the ocean" loading="lazy" width="1100" height="734" />
           <div class="benefit__copy">
-            <span class="benefit__num">05</span>
+            <span class="benefit__num">05 · Benefit</span>
             <h3>Fast recovery</h3>
             <p>IV hydration gets nutrients into your bloodstream fast. Feel better, faster.</p>
           </div>
         </article>
       </section>
 
-      <!-- 04 · The IV menu (molecules) ---------------------------------- -->
-      <section class="menu" id="menu" data-chapter="3">
+      <!-- 04 · The formula: inside the fluid ----------------------------- -->
+      <section class="menu" id="menu" data-chapter="3" data-theme="dark">
         <header class="section-head section-head--wide">
-          <div>
-            <p class="eyebrow">04 · Choose</p>
+          <div class="scrim">
+            <p class="tag">04 · The formula</p>
             <h2 class="display" data-split>The IV <em>menu</em></h2>
           </div>
-          <p class="section-head__lede" data-reveal>
+          <p class="section-head__lede scrim" data-reveal>
             Explore our IV therapy menu, curated for hydration, recovery, immunity, and beyond. Tap any ingredient to
             learn what it does. Your wellness journey starts here.
           </p>
@@ -238,42 +244,48 @@
         <div class="addons glass">
           <div class="addons__head">
             <h3>Add-ons</h3>
-            <p>Add to any drip.</p>
+            <p>Add to any drip</p>
           </div>
           <ul class="addons__list"><!-- render:addons --></ul>
           <a class="btn btn--ghost" href="sms:+18184829426">Text us to customize <!-- icon:arrow --></a>
         </div>
       </section>
 
-      <!-- 05 · About (the orb) ------------------------------------------ -->
+      <!-- 05 · Revive ---------------------------------------------------- -->
       <section class="about" id="about" data-chapter="4">
-        <h2 class="eyebrow"><span aria-hidden="true">05 · Revive · </span>About us</h2>
-        <p class="about__statement" data-scrub-words>
-          At Revive Drip Haus, we bring hydration, wellness, and recovery directly to you, whenever and wherever.
-        </p>
-        <div class="about__cols">
-          <p data-reveal>
-            Whether you're battling fatigue, recovering from a night out, boosting athletic performance, or simply
-            prioritizing your health, our on-demand mobile IV hydration service delivers the fastest and most effective
-            results.
-          </p>
-          <p data-reveal>
-            Our team of licensed medical professionals combines over a decade of emergency medicine and critical care
-            experience with concierge-level service, customizing treatments to meet your specific needs. Using
-            high-quality vitamins, minerals, antioxidants, and electrolytes, we help you rehydrate, replenish, and
-            revitalize, all in the comfort of your home, office, hotel, or event.
-          </p>
+        <div class="about__inner">
+          <div class="scrim">
+            <h2 class="tag"><span aria-hidden="true">05 · Revive · </span>About us</h2>
+            <p class="about__statement" data-scrub-words>
+              At Revive Drip Haus, we bring hydration, wellness, and recovery directly to you, whenever and wherever.
+            </p>
+          </div>
+          <div class="about__cols scrim">
+            <p data-reveal>
+              Whether you're battling fatigue, recovering from a night out, boosting athletic performance, or simply
+              prioritizing your health, our on-demand mobile IV hydration service delivers the fastest and most
+              effective results.
+            </p>
+            <p data-reveal>
+              Our team of licensed medical professionals combines over a decade of emergency medicine and critical care
+              experience with concierge-level service, customizing treatments to meet your specific needs. Using
+              high-quality vitamins, minerals, antioxidants, and electrolytes, we help you rehydrate, replenish, and
+              revitalize, all in the comfort of your home, office, hotel, or event.
+            </p>
+          </div>
+          <div class="scrim">
+            <p class="about__sign display" data-split>You call. <em>We come.</em></p>
+            <p class="about__note" data-reveal>
+              Because taking your wellness to the next level and feeling your best should always be convenient.
+            </p>
+          </div>
         </div>
-        <p class="about__sign display" data-split>You call. <em>We come.</em></p>
-        <p class="about__note" data-reveal>
-          Because taking your wellness to the next level and feeling your best should always be convenient.
-        </p>
       </section>
 
-      <!-- 06 · FAQ + contact --------------------------------------------- -->
+      <!-- 06 · Book: FAQ + contact --------------------------------------- -->
       <section class="faq" id="faq" data-chapter="5">
-        <header class="section-head">
-          <p class="eyebrow">06 · Book</p>
+        <header class="section-head scrim">
+          <p class="tag">06 · Book</p>
           <h2 class="display" data-split>Questions, <em>answered</em></h2>
           <p class="section-head__lede" data-reveal>
             Can't find what you're looking for? Text our friendly team or email
@@ -284,12 +296,10 @@
       </section>
 
       <section class="contact" id="contact">
-        <div class="contact__intro">
-          <h2 class="display contact__title" data-split>Text or call <em>to book</em></h2>
+        <div class="contact__intro scrim">
+          <h2 class="display" data-split>Text or call <em>to book</em></h2>
           <a class="contact__phone" href="tel:+18184829426">(818) 482-9426</a>
-          <p class="contact__lede">
-            Call us or send a message and someone will be in touch within 2 hours.
-          </p>
+          <p class="contact__lede">Call us or send a message and someone will be in touch within 2 hours.</p>
           <ul class="contact__facts">
             <li><span>Hours</span>Open 24/7</li>
             <li><span>Serving</span>Los Angeles, Ventura &amp; Orange County</li>
@@ -323,7 +333,7 @@
     <footer class="footer">
       <div class="footer__top">
         <div class="footer__brand">
-          <span class="wordmark wordmark--lg">REV<b>IV</b>E <small>drip haus</small></span>
+          <span class="wordmark">REV<b>IV</b>E <small>drip haus</small></span>
           <p>Helping you achieve wellness.</p>
         </div>
         <nav class="footer__links" aria-label="Footer">
@@ -345,7 +355,7 @@
         <p>© <span data-year>2026</span> Revive Drip Haus. All rights reserved.</p>
         <p>Designed by <a href="https://www.tenelevenmedia.com/" rel="noopener">Ten Eleven Media</a></p>
       </div>
-      <p class="footer__giant" aria-hidden="true">REV<b>IV</b>E</p>
+      <p class="footer__giant" aria-hidden="true">Revive</p>
     </footer>
 
     <!-- Ingredient detail dialog (filled by JS) -->
@@ -353,7 +363,7 @@
       <form method="dialog" class="ingredient-dialog__close-form">
         <button class="ingredient-dialog__close" aria-label="Close">×</button>
       </form>
-      <p class="eyebrow">Ingredient</p>
+      <p class="tag">Ingredient</p>
       <h3 id="ingredient-title"></h3>
       <div class="ingredient-dialog__body"></div>
       <p class="ingredient-dialog__in"></p>

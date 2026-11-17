@@ -45,7 +45,8 @@ const { PNG } = require('pngjs');
         // skip text currently covered by a fixed bar (nav, HUD): that's scrolled-under content
         const cx = (Math.max(0, rect.left) + Math.min(innerWidth, rect.right)) / 2, cy = (Math.max(0, rect.top) + Math.min(innerHeight, rect.bottom)) / 2;
         const top = document.elementFromPoint(cx, cy);
-        if (top && !el.contains(top) && !top.contains(el) && top.closest('.nav, .hud, .hud__motion, .hud__chapters')) { window.__occluded = (window.__occluded || 0) + 1; continue; }
+        if (top && !el.contains(top) && !top.contains(el) && top.closest('.nav, .hud, .hud__bar, .dripline')) { window.__occluded = (window.__occluded || 0) + 1; continue; }
+        if (!el.closest('.nav, .hud') && [...document.querySelectorAll('.nav, .hud__bar, .dripline')].some((bar) => { const q = bar.getBoundingClientRect(); return q.width && rect.left < q.right && rect.right > q.left && rect.top < q.bottom && rect.bottom > q.top; })) { window.__occluded = (window.__occluded || 0) + 1; continue; }
         const cs = getComputedStyle(el);
         const m = cs.color.match(/[\d.]+/g).map(Number);
         const a = (m[3] ?? 1) * op;

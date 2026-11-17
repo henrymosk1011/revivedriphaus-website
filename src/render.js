@@ -35,26 +35,31 @@ function dripCard(d, i) {
         )
         .join('')}</ul>`
     : '';
-  const chooseNote = d.choose ? `<p class="drip__note">Choose any ${d.choose}:</p>` : '';
+  const k = d.choose ? `Choose any ${d.choose}` : "What's inside";
+  // Each card is an IV bag: hanger, frosted bag with fluid, a printed label and a port.
+  const level = (0.58 + ((i * 37) % 30) / 100).toFixed(2);
   return `
-<article class="drip glass" data-tag="${esc(d.tag)}" id="drip-${esc(d.id)}" style="--i:${i}">
-  <div class="drip__head">
-    <span class="drip__num">${pad(i + 1)}</span>
-    <span class="drip__tag">${esc(tagLabel[d.tag])}</span>
+<article class="drip" data-tag="${esc(d.tag)}" id="drip-${esc(d.id)}" style="--level:${level}">
+  <span class="drip__hanger" aria-hidden="true"></span>
+  <div class="drip__bag">
+    <span class="drip__fluid" aria-hidden="true"></span>
+    <div class="drip__label">
+      <p class="drip__row"><span>No. ${pad(i + 1)}</span><span>${esc(tagLabel[d.tag])}</span></p>
+      <h3 class="drip__name">${esc(d.name)}</h3>
+      <p class="drip__lede">${esc(d.lede)}</p>
+      <p class="drip__body">${esc(d.body)}</p>
+      ${doses}
+      <div class="drip__ing">
+        <p class="drip__k">${k}</p>
+        <ul class="chips">${chips(d.ingredients)}</ul>
+      </div>
+      <div class="drip__foot">
+        <p class="drip__price">${d.from ? '<small>from</small>' : '<small>per drip</small>'}<span class="cur">$</span>${d.price}</p>
+        <a class="btn btn--primary btn--sm" href="${esc(smsFor(`Hi! I'd like to book a ${d.name}.`))}">Book<span class="sr-only"> ${esc(d.name)} by text message</span> ${arrow}</a>
+      </div>
+    </div>
   </div>
-  <div class="drip__bag" aria-hidden="true"><span class="drip__liquid"></span><span class="drip__line"></span></div>
-  <h3 class="drip__name">${esc(d.name)}</h3>
-  <p class="drip__lede">${esc(d.lede)}</p>
-  <p class="drip__body">${esc(d.body)}</p>
-  ${doses}
-  <div class="drip__ing">
-    ${chooseNote || `<p class="drip__note">What's inside</p>`}
-    <ul class="chips">${chips(d.ingredients)}</ul>
-  </div>
-  <div class="drip__foot">
-    <p class="drip__price">${d.from ? '<small>from</small>' : ''}<span class="cur">$</span>${d.price}</p>
-    <a class="btn btn--primary btn--sm" href="${esc(smsFor(`Hi! I'd like to book a ${d.name}.`))}">Book<span class="sr-only"> ${esc(d.name)} by text message</span> ${arrow}</a>
-  </div>
+  <span class="drip__port" aria-hidden="true"></span>
 </article>`;
 }
 

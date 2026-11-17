@@ -302,7 +302,7 @@ function initForms() {
 
 // --- Video: plays only on screen, can be paused, respects the motion setting ---------------
 function initVideo() {
-  const v = document.querySelector('.arrive__video video');
+  const v = document.querySelector('.video-card video');
   const btn = document.querySelector('[data-video-toggle]');
   if (!v) return;
   let onScreen = false;

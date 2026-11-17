@@ -53,7 +53,7 @@ const ok = (c, msg) => console.log(`${c ? 'PASS' : 'FAIL'}  ${msg}`);
   const vt = p.locator('[data-video-toggle]');
   await vt.scrollIntoViewIfNeeded(); await p.waitForTimeout(400);
   const l1 = await vt.getAttribute('aria-label'); await vt.click(); await p.waitForTimeout(200); const l2 = await vt.getAttribute('aria-label');
-  ok(l1 === 'Pause video' && l2 === 'Play video' && (await p.evaluate(() => document.querySelector('.arrive__video video').paused)), `video button pauses the video (${l1} → ${l2})`);
+  ok(l1 === 'Pause video' && l2 === 'Play video' && (await p.evaluate(() => document.querySelector('.video-card video').paused)), `video button pauses the video (${l1} → ${l2})`);
   await ctx.close();
 
   // Mobile menu

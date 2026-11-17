@@ -1,19 +1,21 @@
 # Revive Drip Haus · concept redesign
 
-A redesign of [revivedriphaus.com](https://www.revivedriphaus.com) built around a **scroll-driven 3D film**: the whole homepage plays like one continuous video as you scroll, with real-time WebGL (three.js) rather than pre-rendered footage. All copy, prices and photos are carried over from the live site.
+A redesign of [revivedriphaus.com](https://www.revivedriphaus.com) built around one idea: **the IV drip**. The whole homepage plays like one continuous macro film as you scroll, rendered live in WebGL (three.js) rather than pre-recorded footage. The page around it is a bright, clinical-luxury design in the brand's greens, with type and details borrowed from IV-bag labels. All copy, prices and photos are carried over from the live site.
 
 ## The film
 
-Scrolling is the play button. Each page section is a chapter, and the camera eases toward the scroll position so it feels like scrubbing video:
+Scrolling is the play button. Each page section is a chapter, and the camera eases toward the scroll position so it feels like scrubbing video. A thin IV line on the right fills with fluid as you go, and the meter at the bottom counts the millilitres "infused".
 
 | # | Section | What plays |
 |---|---|---|
-| 01 Arrive | Hero | A morphing drop of liquid glass with halo rings and falling drip streaks |
-| 02 Travel | "We come to you" | The drop falls through a starry night onto the LA coast at sunset, then becomes a light trail racing along a palm-lined coastal road to a house in the hills |
-| 03 Absorb | Benefits | A cut into the bloodstream: crimson vessel walls, red blood cells, and the green IV nutrients streaming through |
-| 04 Choose | IV menu | Out of the vessel into a field of glassy vitamin molecules |
-| 05 Revive | About | Thousands of particles assemble into a glowing orb around a re-formed drop |
-| 06 Book | FAQ + contact | The orb breathes beside the booking details |
+| 01 Bag | Hero | A glossy IV bag of green fluid hangs in a white studio, with a printed Revive label and a gentle slosh |
+| 02 Drop | "We come to you" | Macro shot inside the drip chamber: a drop swells at the tip, falls, and splashes into the pool |
+| 03 Line | Benefits | The camera follows the fluid as it fills the clear IV line, past the Y-site and roller clamp |
+| 04 Formula | IV menu | A dive into the fluid itself: light shafts, bubbles and the vitamin and mineral molecules in each drip |
+| 05 Revive | About | Back out through the surface, a single drop lands: a crown splash in bullet time |
+| 06 Book | FAQ + contact | A jet rises and releases one perfect drop, which hovers beside the booking details |
+
+The IV menu cards are styled as IV bags too: a hanger tab, a frosted bag whose fluid level fills when the card appears, a printed label with the drip's details, and a port at the bottom.
 
 ## Run it
 
@@ -34,7 +36,8 @@ The production address used for canonical URLs, social cards and the sitemap def
 - **Page copy:** `index.html` and `consent-form.html`.
 - **Service areas:** `serviceAreas` in `content.js` (shown on the page and in the search-engine data).
 - **Photos & video:** `public/media/` (client photos converted to WebP).
-- **Colours & type:** CSS variables at the top of `src/styles/main.css`. Brand greens from the live site: `#116935` and `#19a352`.
+- **Colours & type:** CSS variables at the top of `src/styles/main.css`. Brand greens from the live site: `#116935` and `#19a352`. Type: Instrument Serif (headlines), IBM Plex Mono (label details) and Manrope (body).
+- **Logo:** `public/media/revive-logo.png` (the client's logo, cropped to its edges).
 
 ## Forms
 
@@ -51,8 +54,8 @@ The consent form collects medical history (PHI). Connect it only to a HIPAA-comp
 What's built in:
 
 - **Motion control:** a "Pause animation" button (bottom left) freezes the ambient 3D animation, transition flashes, CSS animations and the looping video. It's remembered between visits, and it's on by default when the visitor's device asks for reduced motion. Scrolling still moves the story, because the visitor controls that.
-- **Flashes:** the two scene transitions are soft single flashes, well under the 3-per-second limit, and switched off entirely when motion is paused.
-- **Contrast:** soft dark scrims sit behind every block of copy that floats over the 3D film, and nav, HUD, buttons and cards have dark glass backings.
+- **Flashes:** none. Scene changes are a slow liquid wipe (a waterline sweeping across the frame), not a flash.
+- **Contrast:** a soft field of light runs in from the left behind every block of copy that floats over the 3D film (a dark one in the underwater menu chapter), and the nav, HUD, buttons and cards have solid or frosted backings.
 - **Keyboard:**
   - Skip link to the main content, and visible focus rings throughout.
   - In-page links move keyboard focus to the section they jump to.
@@ -73,7 +76,7 @@ What's built in:
 How it was verified:
 
 - axe-core (WCAG 2.0/2.1/2.2 A and AA, plus best practices) reports 0 violations on the homepage, consent form and 404 page, at desktop and phone sizes.
-- axe can't judge text over a WebGL canvas, so contrast was measured from rendered pixels at 20 moments of the film, desktop and phone. Everything passes except text in mid-fade transitions and lines partly scrolled under the fixed nav or HUD.
+- axe can't judge text over a WebGL canvas, so contrast was measured from rendered pixels at 17 moments of the film, at desktop and phone sizes: every text sample passes AA (lines partly scrolled under the fixed nav or HUD are skipped).
 - 19 scripted keyboard and screen-reader behaviour checks pass.
 
 Re-run the audits after changes (they need Playwright with Chromium installed, and the preview server running via `npm run build && npm run preview`):
@@ -82,7 +85,7 @@ Re-run the audits after changes (they need Playwright with Chromium installed, a
 node scripts/audit/axe.cjs /
 node scripts/audit/axe.cjs /consent-form mobile
 node scripts/audit/keyboard.cjs
-node scripts/audit/contrast.cjs desktop 0,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6
+node scripts/audit/contrast.cjs desktop 0,0.5,1.2,1.4,1.9,2.2,2.5,2.8,3.1,3.4,3.7,4.2,4.5,4.8,5.2,5.5,5.8
 ```
 
 Still recommended before calling it compliant: a manual pass with VoiceOver (iOS/macOS) and NVDA (Windows), and a review by an accessibility auditor. Automated tools catch roughly half of real-world issues.
@@ -120,7 +123,11 @@ src/motion.js              pause-animation control
 src/render.js              build-time HTML for menu, FAQ, service areas, JSON-LD
 src/scene/Film.js          renderer, post-processing, colour grade, timeline
 src/scene/Director.js      camera shots (splines + monotone timing)
-src/scene/*.js             Droplet, Coast, Tunnel, Molecules, Orb, Sky, Dust
+src/scene/IVBag.js         the bag, label, drip chamber, macro drop
+src/scene/Line.js          IV line with Y-site and roller clamp
+src/scene/FluidWorld.js    inside the fluid: bubbles, light, molecules
+src/scene/Splash.js        crown splash, jet and hovering drop
+src/scene/*.js             Droplet, Molecules, Sky, environment, FinalShader
 ```
 
 ## Content to confirm with the client

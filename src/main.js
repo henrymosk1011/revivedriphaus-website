@@ -1,4 +1,5 @@
-import '@fontsource/anton/400.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/instrument-serif/400.css';
 import '@fontsource/instrument-serif/400-italic.css';
 import '@fontsource-variable/manrope/index.css';
@@ -106,8 +107,9 @@ if (capture) {
       return !!film;
     },
     anchors: () => timeline.anchors,
-    // T: film time, t: seconds into the recording (drives GSAP + shaders)
-    frame(T, t) {
+    // T: film time, t: seconds into the recording (drives GSAP + shaders).
+    // draw=false advances scroll and page animations without rendering the film.
+    frame(T, t, draw = true) {
       if (base === null) {
         base = gsap.ticker.time;
         gsap.ticker.remove(gsap.updateRoot);
@@ -117,7 +119,7 @@ if (capture) {
       ScrollTrigger.update();
       gsap.updateRoot(base + t);
       hud.update(T, 1 / 24);
-      if (film) {
+      if (film && draw) {
         film.update(T, 1 / 30, t, true);
         film.render();
       }

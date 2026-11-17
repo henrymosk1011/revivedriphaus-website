@@ -40,45 +40,48 @@ export class Timeline {
   }
 }
 
-// The HUD treats scrolling as the play button.
+// The HUD treats scrolling as the play button: the IV line on the right fills
+// with fluid and the meter counts the millilitres "infused" so far.
 export class Hud {
   constructor(el, timeline, goTo) {
     this.el = el;
     this.timeline = timeline;
-    this.time = el.querySelector('[data-hud-time]');
+    this.ml = el.querySelector('[data-hud-ml]');
     this.label = el.querySelector('.hud__label');
     this.buttons = [...el.querySelectorAll('[data-goto]')];
     this.lastY = window.scrollY;
     this.idle = 0;
     this.chapter = -1;
-    this.buttons.forEach((b) =>
-      b.addEventListener('click', () => goTo(Number(b.dataset.goto)))
-    );
+    this.buttons.forEach((b) => b.addEventListener('click', () => goTo(Number(b.dataset.goto))));
   }
 
   update(T, dt) {
     const total = this.timeline.chapters;
-    const p = Math.min(1, T / total);
+    const p = Math.min(1, Math.max(0, T / total));
     this.el.style.setProperty('--p', p.toFixed(4));
-    const secs = Math.round(p * 60);
-    const text = `00:${String(secs).padStart(2, '0')}`;
-    if (this.time.textContent !== text) this.time.textContent = secs >= 60 ? '01:00' : text;
+    const ml = String(Math.round(p * 1000));
+    if (this.ml && this.ml.textContent !== ml) this.ml.textContent = ml;
 
     const y = window.scrollY;
     const moving = Math.abs(y - this.lastY) > 0.5;
     this.lastY = y;
     this.idle = moving ? 0 : this.idle + dt;
     const playing = this.idle < 0.25;
-    if (playing !== this.playing) {
-      this.playing = playing;
+    const state = playing ? 'Infusing' : p > 0.99 ? 'Complete' : y < 10 ? 'Scroll to infuse' : 'Paused';
+    if (state !== this.state) {
+      this.state = state;
       this.el.classList.toggle('is-playing', playing);
-      this.label.textContent = playing ? 'Playing' : p > 0.99 ? 'The end' : y < 10 ? 'Scroll to play' : 'Paused';
+      this.label.textContent = state;
     }
 
     const c = Math.min(total - 1, Math.floor(T + 0.02));
     if (c !== this.chapter) {
       this.chapter = c;
-      this.buttons.forEach((b, i) => b.classList.toggle('is-active', i === c));
+      this.buttons.forEach((b, i) => {
+        b.classList.toggle('is-active', i === c);
+        if (i === c) b.setAttribute('aria-current', 'step');
+        else b.removeAttribute('aria-current');
+      });
     }
   }
 }
