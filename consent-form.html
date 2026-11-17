@@ -3,12 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Consent Form | Revive Drip Haus</title>
-    <meta name="description" content="Consent for treatment and medical history form for Revive Drip Haus mobile IV therapy." />
-    <meta name="robots" content="noindex" />
+    <title>Consent Form | Revive Drip Haus Mobile IV Therapy</title>
+    <meta
+      name="description"
+      content="Consent for treatment and medical history form for Revive Drip Haus mobile IV therapy. Complete it before your appointment."
+    />
+    <link rel="canonical" href="%SITE_URL%/consent-form" />
+    <meta name="robots" content="noindex, follow" />
     <meta name="theme-color" content="#03100a" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <script>
       document.documentElement.classList.add('js', 'no-webgl', 'is-ready');
     </script>
@@ -19,15 +24,16 @@
     <div class="film-fallback" aria-hidden="true"></div>
 
     <header class="nav is-scrolled" id="nav">
-      <a class="brand" href="./" aria-label="Revive Drip Haus home">
+      <a class="brand" href="./">
         <img class="brand__avatar" src="/media/nurse-avatar.png" alt="" width="123" height="139" />
-        <span class="wordmark">REV<b>IV</b>E<small>drip haus</small></span>
+        <span class="wordmark">REV<b>IV</b>E <small>drip haus</small></span>
+        <span class="sr-only">, home</span>
       </a>
       <nav class="nav__links" aria-label="Main">
         <a href="./#about">About</a>
         <a href="./#menu">IV Menu</a>
         <a href="./#faq">FAQ</a>
-        <a href="./consent.html" class="is-active" aria-current="page">Consent Form</a>
+        <a href="./consent-form" class="is-active" aria-current="page">Consent Form</a>
         <a href="./#contact">Contact</a>
       </nav>
       <a class="btn btn--primary btn--sm nav__cta" href="sms:+18184829426">Text to book</a>
@@ -40,7 +46,7 @@
         <a href="./#about">About</a>
         <a href="./#menu">IV Menu</a>
         <a href="./#faq">FAQ</a>
-        <a href="./consent.html" aria-current="page">Consent Form</a>
+        <a href="./consent-form" aria-current="page">Consent Form</a>
         <a href="./#contact">Contact</a>
       </nav>
       <div class="mobile-menu__foot">
@@ -49,7 +55,7 @@
       </div>
     </div>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
       <div class="consent">
         <p class="eyebrow">Before your visit</p>
         <h1 class="display consent__title">Consent <em>form</em></h1>
@@ -62,13 +68,14 @@
           treatment. Prefer to do it by phone? Call or text <a href="tel:+18184829426">(818) 482-9426</a>.
         </p>
 
-        <form class="form glass" data-form="consent" novalidate>
+        <form class="form glass" data-form="consent" novalidate aria-describedby="consent-hint">
+          <p class="form__hint" id="consent-hint">Fields marked <span class="req" aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
           <fieldset>
             <legend>About you</legend>
-            <label><span>Full name of patient <span class="req">*</span></span><input name="full_name" autocomplete="name" required /></label>
+            <label><span>Full name of patient <span class="req" aria-hidden="true">*</span></span><input name="full_name" autocomplete="name" required /></label>
             <div class="form__row">
-              <label><span>Date of birth <span class="req">*</span></span><input name="date_of_birth" type="date" autocomplete="bday" required /></label>
-              <label><span>Gender <span class="req">*</span></span>
+              <label><span>Date of birth <span class="req" aria-hidden="true">*</span></span><input name="date_of_birth" type="date" autocomplete="bday" required /></label>
+              <label><span>Gender <span class="req" aria-hidden="true">*</span></span>
                 <select name="gender" required>
                   <option value="">Please select</option>
                   <option>Male</option>
@@ -80,7 +87,7 @@
             </div>
             <div class="form__row">
               <label>Email address<input name="email" type="email" autocomplete="email" /></label>
-              <label><span>Phone number <span class="req">*</span></span><input name="phone" type="tel" autocomplete="tel" placeholder="(000) 000-0000" required /></label>
+              <label><span>Phone number <span class="req" aria-hidden="true">*</span></span><input name="phone" type="tel" autocomplete="tel" placeholder="(000) 000-0000" required /></label>
             </div>
           </fieldset>
 
@@ -96,8 +103,8 @@
 
           <fieldset>
             <legend>Medical history</legend>
-            <span class="field-label">Check any medical conditions that apply to you <span class="req">*</span></span>
-            <div class="checks" data-require-one>
+            <span class="field-label" id="conditions-label">Check any medical conditions that apply to you <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></span>
+            <div class="checks" role="group" aria-labelledby="conditions-label" data-require-one>
               <label class="check"><input type="checkbox" name="conditions" value="None" />None of these</label>
               <label class="check"><input type="checkbox" name="conditions" value="Asthma" />Asthma</label>
               <label class="check"><input type="checkbox" name="conditions" value="High blood pressure" />High blood pressure</label>
@@ -113,8 +120,8 @@
             </div>
             <label>Other medical conditions not listed above<input name="other_conditions" /></label>
 
-            <span class="field-label">Are you currently taking any medication? <span class="req">*</span></span>
-            <div class="radios">
+            <span class="field-label" id="medication-label">Are you currently taking any medication? <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></span>
+            <div class="radios" role="radiogroup" aria-labelledby="medication-label" aria-required="true">
               <label class="check"><input type="radio" name="taking_medication" value="Yes" required />Yes</label>
               <label class="check"><input type="radio" name="taking_medication" value="No" />No</label>
             </div>

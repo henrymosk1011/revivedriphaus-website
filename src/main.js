@@ -10,26 +10,25 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Timeline, Hud } from './timeline.js';
 import { initUI } from './ui.js';
 import { initAnimations, playIntro } from './animations.js';
+import { motion, initMotionToggle } from './motion.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const root = document.documentElement;
 const params = new URLSearchParams(location.search);
 const capture = params.has('capture');
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const loaderBar = document.querySelector('.loader__bar');
-const setProgress = (p) => loaderBar?.style.setProperty('--p', String(p));
+const calmAtLoad = motion.paused && !capture;
 
-// --- Smooth scroll ------------------------------------------------------------
+// --- Smooth scroll (off when the OS asks for reduced motion) ------------------
 let lenis = null;
-if (!reduceMotion && !capture) {
+if (!motion.prefersReduced && !capture) {
   lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, touchMultiplier: 1.3 });
   lenis.on('scroll', ScrollTrigger.update);
 }
 const scrollTo = (target, opts = {}) => {
   if (lenis) lenis.scrollTo(target, { offset: 0, duration: 1.6, ...opts });
-  else if (typeof target === 'number') window.scrollTo({ top: target, behavior: reduceMotion ? 'auto' : 'smooth' });
-  else document.querySelector(target)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+  else if (typeof target === 'number') window.scrollTo({ top: target, behavior: motion.paused ? 'auto' : 'smooth' });
+  else target?.scrollIntoView?.({ behavior: motion.paused ? 'auto' : 'smooth' });
 };
 
 // --- Film time ----------------------------------------------------------------
@@ -45,53 +44,42 @@ document.fonts?.ready.then(remeasure);
 const hud = new Hud(document.querySelector('.hud'), timeline, (i) => scrollTo(timeline.anchors[i] + (i === 0 ? 0 : 2)));
 
 initUI({ scrollTo, lenis, timeline });
+initMotionToggle();
 
-// --- WebGL film (loaded on demand) --------------------------------------------
+// Copy and its animations start straight away; nothing waits on WebGL.
+initAnimations({ reduceMotion: calmAtLoad, timeline });
+playIntro({ reduceMotion: calmAtLoad });
+
+// --- WebGL film (loaded on demand, fades in when ready) --------------------------
 let film = null;
-let ready = false;
 
 function webglOK() {
   try {
-    const c = document.createElement('canvas');
-    return !!c.getContext('webgl2');
+    return !!document.createElement('canvas').getContext('webgl2');
   } catch {
     return false;
   }
 }
 
-function reveal() {
-  if (ready) return;
-  ready = true;
-  root.classList.add('is-ready');
-  remeasure();
-  initAnimations({ reduceMotion, timeline });
-  playIntro({ reduceMotion });
-}
-
 async function boot() {
-  setProgress(0.15);
   if (!webglOK()) {
     root.classList.add('no-webgl');
-    setProgress(1);
-    reveal();
     return;
   }
   try {
     const { Film } = await import('./scene/Film.js');
-    setProgress(0.3);
-    const f = new Film(document.getElementById('film'), { reduceMotion, capture });
-    await f.init(setProgress);
+    const f = new Film(document.getElementById('film'), { reduceMotion: motion.prefersReduced, capture });
+    await f.init();
     film = f; // only hand the film to the render loop once it is fully built
+    motion.onChange((paused) => film.setMotionPaused(paused && !capture));
+    root.classList.add('is-ready');
+    remeasure();
   } catch (err) {
     console.error('[film] failed to start, falling back to static background', err);
     film = null;
     root.classList.add('no-webgl');
   }
-  setTimeout(reveal, 250);
 }
-
-// Safety net: never leave visitors on the loader.
-setTimeout(reveal, 9000);
 boot();
 
 // --- Main loop: smooth scroll → film time → render ------------------------------
@@ -101,7 +89,7 @@ gsap.ticker.add((time, deltaMs) => {
   const dt = Math.min(deltaMs / 1000, 0.1);
   lenis?.raf(time * 1000);
   if (capture) return;
-  clock += dt;
+  if (!motion.paused) clock += dt; // paused: ambient animation holds still
   const T = timeline.timeAt(window.scrollY);
   hud.update(film ? film.T : T, dt);
   if (film && document.visibilityState === 'visible') {
@@ -115,7 +103,7 @@ if (capture) {
   let base = null;
   window.__film = {
     get ready() {
-      return !!film && ready;
+      return !!film;
     },
     anchors: () => timeline.anchors,
     // T: film time, t: seconds into the recording (drives GSAP + shaders)

@@ -1,0 +1,13 @@
+{
+  "name": "Revive Drip Haus",
+  "short_name": "Revive",
+  "description": "On-demand mobile IV hydration across Los Angeles, Ventura & Orange County.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#03100a",
+  "theme_color": "#03100a",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

@@ -1,6 +1,6 @@
 // Renders data-driven parts of the pages into static HTML at build time
 // (see vite.config.js), so the menu and FAQ are crawlable and work without JS.
-import { business, ingredients, drips, addons, filters, faqs } from './data/content.js';
+import { business, ingredients, drips, addons, filters, faqs, serviceAreas } from './data/content.js';
 
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -19,7 +19,7 @@ function chips(ids) {
   return ids
     .map(
       (id) =>
-        `<li><button type="button" class="chip" data-ingredient="${esc(id)}">${esc(ingredients[id].name)}</button></li>`
+        `<li><button type="button" class="chip" data-ingredient="${esc(id)}" aria-haspopup="dialog">${esc(ingredients[id].name)}</button></li>`
     )
     .join('');
 }
@@ -31,7 +31,7 @@ function dripCard(d, i) {
           ([amt, how, price]) =>
             `<li><span><strong>${esc(amt)}</strong> ${esc(how)}</span><a class="dose__book" href="${esc(
               smsFor(`Hi! I'd like to book an NAD+ ${amt} drip.`)
-            )}">$${price} ${arrow}</a></li>`
+            )}">$${price}<span class="sr-only">: book NAD+ ${esc(amt)} by text message</span> ${arrow}</a></li>`
         )
         .join('')}</ul>`
     : '';
@@ -53,7 +53,7 @@ function dripCard(d, i) {
   </div>
   <div class="drip__foot">
     <p class="drip__price">${d.from ? '<small>from</small>' : ''}<span class="cur">$</span>${d.price}</p>
-    <a class="btn btn--primary btn--sm" href="${esc(smsFor(`Hi! I'd like to book a ${d.name}.`))}">Book ${arrow}</a>
+    <a class="btn btn--primary btn--sm" href="${esc(smsFor(`Hi! I'd like to book a ${d.name}.`))}">Book<span class="sr-only"> ${esc(d.name)} by text message</span> ${arrow}</a>
   </div>
 </article>`;
 }
@@ -108,10 +108,91 @@ export function renderDripOptions() {
   return opts.map((o) => `<option>${esc(o)}</option>`).join('');
 }
 
+export function renderServiceAreas() {
+  return serviceAreas
+    .map(
+      ([county, cities]) =>
+        `<div class="areas__group"><h4>${esc(county)}</h4><p>${cities.map(esc).join(', ')}</p></div>`
+    )
+    .join('');
+}
+
+// Structured data for search engines, generated from the same content as the
+// page so prices and answers never drift apart.
+export function renderJsonLd(siteUrl) {
+  const site = siteUrl.replace(/\/$/, '');
+  const offers = [
+    ...drips.flatMap((d) =>
+      d.doses
+        ? d.doses.map(([amt, how, price]) => ({ name: `NAD+ ${amt} (${how})`, description: d.body, price }))
+        : [{ name: d.name, description: `${d.lede} ${d.body}`, price: d.price }]
+    ),
+    ...addons.map((a) => ({ name: `${a.name} (add-on)`, description: a.text, price: a.price })),
+  ];
+  const graph = [
+    {
+      '@type': 'WebSite',
+      '@id': `${site}/#website`,
+      url: `${site}/`,
+      name: business.name,
+      inLanguage: 'en-US',
+      publisher: { '@id': `${site}/#business` },
+    },
+    {
+      '@type': ['MedicalBusiness', 'LocalBusiness'],
+      '@id': `${site}/#business`,
+      name: business.name,
+      url: `${site}/`,
+      description:
+        'On-demand mobile IV hydration therapy. Licensed medical professionals bring IV fluids, vitamins, minerals and NAD+ to your home, office, hotel or event.',
+      telephone: '+1-818-482-9426',
+      email: 'info@revivedriphaus.com',
+      image: `${site}/og-image.jpg`,
+      logo: `${site}/icons/icon-192.png`,
+      priceRange: '$$',
+      currenciesAccepted: 'USD',
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        opens: '00:00',
+        closes: '23:59',
+      },
+      areaServed: serviceAreas.flatMap(([county, cities]) => [
+        { '@type': 'AdministrativeArea', name: `${county}, CA` },
+        ...cities.map((c) => ({ '@type': 'City', name: `${c}, CA` })),
+      ]),
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'IV Therapy Menu',
+        itemListElement: offers.map((o) => ({
+          '@type': 'Offer',
+          price: String(o.price),
+          priceCurrency: 'USD',
+          itemOffered: { '@type': 'Service', name: o.name, description: o.description, serviceType: 'Mobile IV therapy' },
+        })),
+      },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${site}/#faq`,
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.list ? `${f.a} ${f.list.join(', ')}.` : f.a },
+      })),
+    },
+  ];
+  const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }, null, 2).replace(/</g, '\\u003c');
+  return `<script type="application/ld+json">\n${json}\n</script>`;
+}
+
 export const icons = { arrow, phone };
 
-export function renderAll(html) {
+export function renderAll(html, { siteUrl = 'https://www.revivedriphaus.com' } = {}) {
   return html
+    .replaceAll('%SITE_URL%', siteUrl.replace(/\/$/, ''))
+    .replace('<!-- render:jsonld -->', renderJsonLd(siteUrl))
+    .replace('<!-- render:areas -->', renderServiceAreas())
     .replace('<!-- render:menu -->', renderMenu())
     .replace('<!-- render:filters -->', renderFilters())
     .replace('<!-- render:addons -->', renderAddons())

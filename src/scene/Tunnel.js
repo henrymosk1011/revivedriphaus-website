@@ -81,14 +81,14 @@ export class Tunnel {
           float v = abs(snoise(q));
           float v2 = abs(snoise(q * 2.3 + 4.0));
           float veins = smoothstep(0.07, 0.0, v) + smoothstep(0.05, 0.0, v2) * 0.55;
-          vec3 base = mix(vec3(0.006, 0.04, 0.024), vec3(0.02, 0.13, 0.07), smoothstep(-0.8, 0.9, vDisp));
+          vec3 base = mix(vec3(0.035, 0.002, 0.007), vec3(0.17, 0.012, 0.026), smoothstep(-0.8, 0.9, vDisp));
           vec3 col = base;
-          col += vec3(0.25, 1.0, 0.55) * veins * 0.75;
+          col += vec3(1.0, 0.3, 0.33) * veins * 0.42;
           float band = smoothstep(0.65, 1.0, sin(z * 0.35 + uTime * 3.0) * 0.5 + 0.5);
-          col += vec3(0.1, 0.45, 0.25) * band * 0.25;
+          col += vec3(0.38, 0.03, 0.06) * band * 0.25;
           float dist = length(vViewPos);
           float fog = 1.0 - exp(-dist * 0.028);
-          vec3 fogCol = mix(vec3(0.0, 0.03, 0.017), vec3(0.75, 1.0, 0.85), uExit * smoothstep(40.0, 120.0, dist));
+          vec3 fogCol = mix(vec3(0.022, 0.0, 0.004), vec3(0.75, 1.0, 0.85), uExit * smoothstep(40.0, 120.0, dist));
           col = mix(col, fogCol, fog);
           gl_FragColor = vec4(col, 1.0);
         }`,
@@ -99,7 +99,7 @@ export class Tunnel {
   }
 
   buildCells(count) {
-    // A biconcave disc (red-cell silhouette, rendered in brand emerald).
+    // A biconcave disc: the classic red blood cell.
     const prof = [
       [0, 0.16], [0.3, 0.19], [0.62, 0.3], [0.86, 0.36], [0.99, 0.24], [1.03, 0],
       [0.99, -0.24], [0.86, -0.36], [0.62, -0.3], [0.3, -0.19], [0, -0.16],
@@ -109,17 +109,17 @@ export class Tunnel {
     const geo = new THREE.LatheGeometry(prof, 40);
     geo.computeVertexNormals();
     const mat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#1c9b55'),
-      roughness: 0.32,
+      color: new THREE.Color('#c3141f'),
+      roughness: 0.34,
       metalness: 0,
-      clearcoat: 0.8,
-      clearcoatRoughness: 0.2,
+      clearcoat: 0.6,
+      clearcoatRoughness: 0.25,
       sheen: 1,
-      sheenColor: new THREE.Color('#ceff65'),
-      sheenRoughness: 0.35,
-      emissive: new THREE.Color('#0a3d22'),
-      emissiveIntensity: 0.6,
-      envMapIntensity: 1.2,
+      sheenColor: new THREE.Color('#ff9a9a'),
+      sheenRoughness: 0.4,
+      emissive: new THREE.Color('#3d0307'),
+      emissiveIntensity: 0.7,
+      envMapIntensity: 0.55,
     });
     this.cells = new THREE.InstancedMesh(geo, mat, count);
     this.cells.frustumCulled = false;
@@ -235,7 +235,7 @@ export class Tunnel {
           uniform float uTime; varying vec2 vUv;
           void main(){
             float d = length(vUv - 0.5) * 2.0;
-            float g = exp(-d * d * 8.0) * 0.85 + exp(-d * 3.5) * 0.18;
+            float g = exp(-d * d * 8.0) * 0.6 + exp(-d * 3.5) * 0.12;
             float rays = 0.85 + 0.15 * sin(atan(vUv.y - 0.5, vUv.x - 0.5) * 14.0 + uTime);
             gl_FragColor = vec4(vec3(0.7, 1.0, 0.82) * g * rays, 1.0);
           }`,

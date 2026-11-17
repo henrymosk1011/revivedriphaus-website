@@ -8,7 +8,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { Sky } from './Sky.js';
 import { Dust } from './Dust.js';
 import { Droplet, HeroSet } from './Droplet.js';
-import { City, GROUND_Y } from './City.js';
+import { Coast, GROUND_Y, SUN_DIR } from './Coast.js';
 import { Tunnel, TUNNEL_ORIGIN, TUNNEL_LENGTH, bend } from './Tunnel.js';
 import { Molecules } from './Molecules.js';
 import { Orb } from './Orb.js';
@@ -18,6 +18,11 @@ import { Director, Shot } from './Director.js';
 import { clamp, lerp, invLerp, smooth, window4, easeInOut } from './util.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const HERO_GLOW_DIR = new THREE.Vector3(0.45, 0.35, -1).normalize();
+const DUST_A = new THREE.Color('#9af2c0');
+const DUST_B = new THREE.Color('#ceff65');
+const DUST_WARM_A = new THREE.Color('#ffd2a8');
+const DUST_WARM_B = new THREE.Color('#ffb0c0');
 
 // Timeline (film time T runs 0 → 6, one unit per page chapter)
 const T_FALL = [1.0, 1.34];
@@ -29,9 +34,10 @@ const T_EXIT = 3.0;
 const GRADE = [
   [0.0, '#082a1c', '#010805', '#1fb867', 0.5, 0.0],
   [0.9, '#072519', '#010604', '#2bd47a', 0.45, 0.0],
-  [1.25, '#031109', '#020b07', '#1fb867', 0.35, 0.0],
-  [1.99, '#031109', '#020b07', '#1fb867', 0.35, 0.0],
-  [2.0, '#020d08', '#010604', '#1fb867', 0.3, 0.0],
+  [1.14, '#0a102c', '#0b0714', '#ff9a5c', 0.12, 0.0],
+  [1.3, '#111a3a', '#24132a', '#ff9a5c', 0.6, 0.0],
+  [1.99, '#111a3a', '#24132a', '#ff9a5c', 0.6, 0.0],
+  [2.0, '#14030a', '#070103', '#ff6b6b', 0.3, 0.0],
   [3.0, '#0b3222', '#020f09', '#ceff65', 0.42, 0.006],
   [3.9, '#0a3020', '#020c07', '#9af2c0', 0.55, 0.008],
   [4.6, '#0b3524', '#010805', '#3be07f', 0.65, 0.004],
@@ -39,7 +45,7 @@ const GRADE = [
 ];
 
 const BLOOM = [
-  [0, 0.7], [0.9, 0.7], [1.3, 0.8], [1.85, 0.85], [2.0, 1.2], [2.15, 0.85], [2.8, 0.9], [3.2, 0.7], [4.2, 0.8], [6, 0.75],
+  [0, 0.7], [0.9, 0.7], [1.2, 0.6], [1.85, 0.62], [2.0, 1.0], [2.15, 0.85], [2.8, 0.9], [3.2, 0.7], [4.2, 0.8], [6, 0.75],
 ];
 
 function table(rows, t, col) {
@@ -61,6 +67,7 @@ export class Film {
     const small = Math.min(window.innerWidth, window.innerHeight) < 700;
     this.quality = coarse || small ? 'low' : 'high';
     this.T = 0;
+    this.motionPaused = false;
     this.pointer = new THREE.Vector2();
     this.pointerSmooth = new THREE.Vector2();
     this.frameTimes = [];
@@ -96,7 +103,7 @@ export class Film {
     this.dust = new Dust({ count: low ? 900 : 1800 });
     this.droplet = new Droplet({ detail: low ? 40 : 72 });
     this.heroSet = new HeroSet({ streaks: low ? 50 : 90 });
-    this.city = new City({ quality: this.quality });
+    this.coast = new Coast({ quality: this.quality, sky: this.sky });
     this.tunnel = new Tunnel({ quality: this.quality });
 
     const exitLocal = bend(-TUNNEL_LENGTH);
@@ -105,7 +112,7 @@ export class Film {
     this.orbCenter = this.exit.clone().add(V(0, 0, -215));
     this.orb = new Orb({ center: this.orbCenter, radius: 6.2, count: low ? 6000 : 14000 });
 
-    scene.add(this.sky.mesh, this.dust.points, this.heroSet.group, this.droplet.group, this.city.group, this.tunnel.group, this.molecules.group, this.orb.group);
+    scene.add(this.sky.mesh, this.dust.points, this.heroSet.group, this.droplet.group, this.coast.group, this.tunnel.group, this.molecules.group, this.orb.group);
 
     // A little direct light for the cells and molecules on top of the env map.
     const key = new THREE.DirectionalLight('#eafff3', 1.4);
@@ -139,7 +146,7 @@ export class Film {
 
     // Compile every material up front (everything visible), so no chapter
     // stutters the first time it appears.
-    const groups = [this.heroSet.group, this.droplet.group, this.city.group, this.tunnel.group, this.molecules.group, this.orb.group];
+    const groups = [this.heroSet.group, this.droplet.group, this.coast.group, this.tunnel.group, this.molecules.group, this.orb.group];
     groups.forEach((g) => (g.visible = true));
     this.camera.position.set(0, 0, 8);
     this.camera.lookAt(0, 0, 0);
@@ -163,8 +170,8 @@ export class Film {
     this.dropY = dropY;
     this.trailFill = (t) => easeInOut(invLerp(T_TRAIL[0], T_TRAIL[1], t));
 
-    const route = this.city.route;
-    const dest = this.city.destination;
+    const route = this.coast.route;
+    const dest = this.coast.destination;
     const shot1 = () => {
       const keys = [
         { t: 0.0, p: V(0, 0.25, 8.2), l: V(0, 0, 0), shift: S(), fov: 36 },
@@ -179,18 +186,27 @@ export class Film {
         const y = dropY(t);
         keys.push({ t, p: V(0.6, y + up, back), l: V(0, Math.max(GROUND_Y, y - look), -1.5), shift: 0, fov: 42 });
       }
-      keys.push({ t: 1.36, p: V(7, GROUND_Y + 21, 15), l: V(0, GROUND_Y + 0.5, -6), shift: 0, fov: 48 });
+      // Landing on the coast road, sunset glowing ahead.
+      keys.push({ t: 1.36, p: V(6, GROUND_Y + 12, 16), l: V(0, GROUND_Y + 0.5, -10), shift: 0, fov: 48 });
+      // Chase the light trail along the coast, low and fast.
       const tan = new THREE.Vector3();
-      [1.45, 1.53, 1.61, 1.69, 1.77, 1.85].forEach((t, i) => {
+      [1.43, 1.5, 1.57, 1.64, 1.71, 1.78, 1.85].forEach((t, i) => {
         const s = this.trailFill(t);
-        const behind = route.getPointAt(Math.max(0, s - 0.05));
-        const ahead = route.getPointAt(Math.min(1, s + 0.07));
-        route.getTangentAt(Math.min(0.999, s), tan);
-        const side = V(-tan.z, 0, tan.x).normalize().multiplyScalar(i % 2 ? 4.5 : -4.5);
-        keys.push({ t, p: behind.clone().add(V(0, 8 + Math.sin(i * 1.7) * 2.5, 0)).add(side), l: ahead.clone().add(V(0, 1, 0)), shift: 0, fov: 52 });
+        const behind = route.getPointAt(Math.max(0, s - 0.03));
+        const ahead = route.getPointAt(Math.min(1, s + 0.055));
+        route.getTangentAt(Math.min(0.999, Math.max(0.001, s)), tan);
+        const side = V(-tan.z, 0, tan.x).normalize().multiplyScalar(0.3 + (i % 2) * 0.6);
+        keys.push({
+          t,
+          p: behind.clone().add(V(0, 3.2 + Math.sin(i * 1.3) * 0.9, 0)).add(side),
+          l: ahead.clone().add(V(-1.5, 1.8, 0)),
+          shift: 0,
+          fov: 54,
+        });
       });
-      keys.push({ t: 1.93, p: dest.clone().add(V(8, 26, 17)), l: dest.clone().add(V(0, 3, 0)), shift: 0, fov: 50 });
-      keys.push({ t: T_CUT, p: dest.clone().add(V(0.6, 5, 1.6)), l: dest.clone().add(V(0, -4, -0.3)), shift: 0, fov: 60 });
+      // Arrive at the house in the hills, then dive into the beacon.
+      keys.push({ t: 1.93, p: dest.clone().add(V(-16, 9, 14)), l: dest.clone().add(V(4, 2, -2)), shift: 0, fov: 50 });
+      keys.push({ t: T_CUT, p: dest.clone().add(V(-0.6, 4, 1.4)), l: dest.clone().add(V(0.3, -4, -0.3)), shift: 0, fov: 60 });
       return new Shot(keys);
     };
 
@@ -272,6 +288,11 @@ export class Film {
     }
   }
 
+  // Visitors can pause ambient motion; scroll still drives the camera.
+  setMotionPaused(paused) {
+    this.motionPaused = paused;
+  }
+
   update(targetT, dt, time, snap = false) {
     // Ease the film towards the scroll position: this is what makes scrolling
     // feel like scrubbing a video rather than jumping between states.
@@ -283,15 +304,17 @@ export class Film {
     }
     if (dt > 0) this.adapt(dt);
     const T = this.T;
-    const t = this.reduceMotion ? time * 0.25 : time;
+    const calm = this.reduceMotion || this.motionPaused;
+    const t = time;
 
     // --- Camera -----------------------------------------------------------
     const cam = this.camera;
     const shot = this.director.sample(T);
-    if (!this.reduceMotion) this.pointerSmooth.lerp(this.pointer, 1 - Math.exp(-dt * 2.5));
+    if (!calm) this.pointerSmooth.lerp(this.pointer, 1 - Math.exp(-dt * 2.5));
+    else this.pointerSmooth.set(0, 0);
     cam.position.copy(shot.pos);
     cam.lookAt(shot.look);
-    const par = T > 1.3 && T < 2 ? 1.6 : 0.35;
+    const par = T > 1.3 && T < 2 ? 0.7 : 0.35;
     cam.translateX(this.pointerSmooth.x * par);
     cam.translateY(this.pointerSmooth.y * par * 0.6);
     cam.lookAt(shot.look);
@@ -302,6 +325,8 @@ export class Film {
     cam.updateProjectionMatrix();
     // Horizontal framing shift (keeps the subject beside the copy on desktop).
     cam.projectionMatrix.elements[8] -= shot.shift * 2;
+    // On narrow screens lift the hero drop above the headline.
+    if (!this.wide) cam.projectionMatrix.elements[9] -= 0.2 * 2 * (1 - smooth(0.55, 1.0, T));
     cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert();
 
     // --- Grade ------------------------------------------------------------
@@ -324,9 +349,22 @@ export class Film {
     su.uGlowAmt.value = table(GRADE, T, 4);
     this.scene.fog.density = table(GRADE, T, 5);
     this.scene.fog.color.copy(su.uBottom.value).lerp(tmpA.copy(su.uTop.value), 0.35);
+    // Dusk on the coast: horizon band, sun, stars.
+    // Falls through a starry indigo night first, then the sunset rises.
+    const out = 1 - smooth(1.995, 2.0, T);
+    const night = smooth(1.0, 1.14, T) * out;
+    const dusk = smooth(1.1, 1.3, T) * out;
+    su.uHorizon.value.set('#ff8a50');
+    su.uHorizonAmt.value = dusk * 0.95;
+    su.uSunAmt.value = dusk;
+    su.uStars.value = night * 0.85;
+    su.uClouds.value = 1 - night;
+    su.uGlowDir.value.copy(HERO_GLOW_DIR).lerp(SUN_DIR, night).normalize();
     this.sky.update(cam, t);
     this.dust.update(cam, t, this.dpr);
-    this.dust.uniforms.uOpacity.value = 0.75 - window4(1.3, 1.4, 1.95, 2.0, T) * 0.45;
+    this.dust.uniforms.uOpacity.value = 0.75 - night * 0.5;
+    this.dust.uniforms.uColorA.value.copy(DUST_A).lerp(DUST_WARM_A, night);
+    this.dust.uniforms.uColorB.value.copy(DUST_B).lerp(DUST_WARM_B, night);
 
     // --- Chapter 1: hero drop ----------------------------------------------
     const heroOn = T < 1.42;
@@ -334,7 +372,7 @@ export class Film {
     this.droplet.group.visible = heroOn || orbDrop;
     if (heroOn) {
       const fall = invLerp(T_FALL[0], T_FALL[1], T);
-      this.droplet.group.position.set(0, this.dropY(T), 0);
+      this.droplet.group.position.set(this.coast.landing.x * smooth(0.2, 1, fall), this.dropY(T), 0);
       this.droplet.group.scale.setScalar(lerp(1.35, 0.75, smooth(0, 1, fall)) * (1 - smooth(0.97, 1, fall)) + 0.0001);
       this.droplet.update(t, {
         amp: 0.1 + smooth(0, 1, T) * 0.05 - smooth(0, 0.5, fall) * 0.08,
@@ -355,21 +393,29 @@ export class Film {
       this.heroSet.update(t, cam, heroAmt);
     }
 
-    // --- Chapter 2: the city -------------------------------------------------
-    this.city.group.visible = T > 0.98 && T < T_CUT + 0.02;
-    if (this.city.group.visible) {
-      const cu = this.city.shared;
-      cu.uFogColor.value.copy(su.uBottom.value).lerp(tmpA.set('#072014'), 0.5);
-      this.city.update(t, cam, this.dpr, {
+    // --- Chapter 2: the coast at dusk -----------------------------------------
+    // The world emerges from haze as the drop falls towards it.
+    this.coast.group.visible = T > 0.98 && T < T_CUT + 0.02;
+    if (this.coast.group.visible) {
+      const haze = tmpA.copy(su.uTop.value).lerp(tmpB.copy(su.uHorizon.value), 0.22 * dusk);
+      const fogColor = this._fogc || (this._fogc = new THREE.Color());
+      fogColor.copy(su.uBottom.value).lerp(haze, night);
+      const fogDensity = lerp(0.06, 0.0036, smooth(1.02, 1.22, T));
+      this.scene.fog.color.copy(fogColor);
+      this.scene.fog.density = fogDensity;
+      this.coast.update(t, cam, this.dpr, {
         fill: this.trailFill(T),
-        splash: invLerp(1.335, 1.52, T),
-        beacon: smooth(1.72, 1.92, T),
+        splash: invLerp(1.335, 1.5, T),
+        beacon: smooth(1.74, 1.93, T),
+        fogColor,
+        fogDensity,
+        sunColor: su.uGlow.value,
       });
     }
 
     // --- Chapter 3: bloodstream ---------------------------------------------
     this.tunnel.group.visible = T >= T_CUT - 0.001 && T < T_EXIT + 0.12;
-    if (this.tunnel.group.visible) this.tunnel.update(t, cam, this.dpr, { exit: smooth(2.75, 3.0, T) * 0.5 });
+    if (this.tunnel.group.visible) this.tunnel.update(t, cam, this.dpr, { exit: smooth(2.75, 3.0, T) * 0.32 });
 
     // --- Chapter 4: molecules ----------------------------------------------
     this.molecules.group.visible = T > 2.85 && T < 4.45;
@@ -380,7 +426,7 @@ export class Film {
     if (this.orb.group.visible) {
       this.orb.update(t, this.dpr, {
         morph: smooth(3.45, 4.55, T),
-        amount: lerp(1, 0.8, window4(4.1, 4.4, 4.85, 5.0, T)) * (this.wide ? 1 : 1 - smooth(5.0, 5.4, T) * 0.45),
+        amount: lerp(1, 0.8, window4(4.1, 4.4, 4.85, 5.0, T)) * (this.wide ? 1 : 1 - smooth(4.9, 5.3, T) * 0.65),
       });
     }
 
@@ -388,11 +434,13 @@ export class Film {
     this.key.position.copy(cam.position).add(V(4, 8, 6));
     this.key.target.position.copy(shot.look);
     this.bloom.strength = table(BLOOM, T, 1);
-    const flash = Math.exp(-Math.pow((T - T_CUT) / 0.045, 2)) * 0.96 + Math.exp(-Math.pow((T - T_EXIT) / 0.05, 2)) * 0.18;
+    // Transition flashes are soft (well under photosensitivity limits) and off
+    // entirely when motion is reduced or paused.
+    const flash = calm ? 0 : Math.exp(-Math.pow((T - T_CUT) / 0.05, 2)) * 0.55 + Math.exp(-Math.pow((T - T_EXIT) / 0.05, 2)) * 0.15;
     const fu = this.final.uniforms;
     fu.uFlash.value = flash;
     fu.uTime.value = t;
-    this.renderer.toneMappingExposure = 1.0 + flash * 0.6;
+    this.renderer.toneMappingExposure = 1.0 + flash * 0.4;
   }
 
   render() {

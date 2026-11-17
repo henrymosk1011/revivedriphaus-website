@@ -14,6 +14,14 @@ export const business = {
   responseTime: 'within 2 hours',
 };
 
+// REVIEW: cities listed for local search. The live site says "Serving LA,
+// Ventura & OC"; confirm these are all within the client's service area.
+export const serviceAreas = [
+  ['Los Angeles County', ['Los Angeles', 'Santa Monica', 'Beverly Hills', 'West Hollywood', 'Hollywood', 'Venice', 'Malibu', 'Pasadena', 'Burbank', 'Glendale', 'Sherman Oaks', 'Studio City', 'Encino', 'Calabasas']],
+  ['Ventura County', ['Thousand Oaks', 'Westlake Village', 'Simi Valley', 'Camarillo', 'Ventura', 'Oxnard']],
+  ['Orange County', ['Irvine', 'Newport Beach', 'Costa Mesa', 'Huntington Beach', 'Laguna Beach', 'Anaheim']],
+];
+
 export const ingredients = {
   vitc: {
     name: 'Vitamin C',

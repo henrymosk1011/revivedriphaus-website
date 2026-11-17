@@ -25,6 +25,7 @@ function liquidMaterial(uniforms, opts = {}) {
     specularIntensity: 1,
     envMapIntensity: 1.25,
     dispersion: 0.4,
+    fog: false,
     ...opts,
   });
 
@@ -151,6 +152,7 @@ export class HeroSet {
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         toneMapped: false,
+        fog: false,
       });
     this.ringA = new THREE.Mesh(new THREE.TorusGeometry(2.55, 0.012, 8, 256), ringMat('#bfffd9', 4, 0.9));
     this.ringA.position.set(0, 0, -1.6);

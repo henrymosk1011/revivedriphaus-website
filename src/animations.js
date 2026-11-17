@@ -48,7 +48,7 @@ export function initAnimations({ reduceMotion }) {
     el.classList.add('is-split');
     gsap.fromTo(
       split.words,
-      { opacity: 0.16 },
+      { opacity: 0.45 }, // never fades below a legible contrast
       {
         opacity: 1,
         ease: 'none',
@@ -63,7 +63,7 @@ export function initAnimations({ reduceMotion }) {
     opacity: 0,
     y: -60,
     ease: 'none',
-    scrollTrigger: { trigger: '.arrive__lower', start: 'top 98%', end: 'top 50%', scrub: true },
+    scrollTrigger: { trigger: '.arrive__lower', start: 'top 78%', end: 'top 52%', scrub: true },
   });
 
   // Stats and drip cards cascade in. Transforms are cleared afterwards so

@@ -3,40 +3,37 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Revive Drip Haus | On-Demand Mobile IV Hydration in Los Angeles</title>
+    <title>Mobile IV Therapy in Los Angeles, 24/7 | Revive Drip Haus</title>
     <meta
       name="description"
-      content="Licensed nurses bring IV hydration, vitamins and recovery drips to your home, office or hotel. Open 24/7 across Los Angeles, Ventura and Orange County. Text or call (818) 482-9426."
+      content="On-demand mobile IV hydration across Los Angeles, Ventura &amp; Orange County. Licensed nurses bring IV drips, vitamins &amp; NAD+ to your home, office or hotel, 24/7."
     />
+    <link rel="canonical" href="%SITE_URL%/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#03100a" />
+    <meta name="format-detection" content="telephone=yes" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Revive Drip Haus" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="%SITE_URL%/" />
     <meta property="og:title" content="Revive Drip Haus | Mobile IV Hydration, Straight to You" />
     <meta
       property="og:description"
-      content="On-demand IV hydration across LA, Ventura & OC. No clinic. No waiting. Open 24/7."
+      content="On-demand IV hydration across LA, Ventura &amp; OC. No clinic. No waiting. Open 24/7. Text or call (818) 482-9426."
     />
-    <meta property="og:image" content="/media/at-home-drip-poster.jpg" />
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "MedicalBusiness",
-        "name": "Revive Drip Haus",
-        "url": "https://www.revivedriphaus.com/",
-        "telephone": "+1-818-482-9426",
-        "email": "info@revivedriphaus.com",
-        "description": "On-demand mobile IV hydration therapy delivered by licensed medical professionals.",
-        "areaServed": ["Los Angeles County, CA", "Ventura County, CA", "Orange County, CA"],
-        "openingHoursSpecification": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-          "opens": "00:00",
-          "closes": "23:59"
-        }
-      }
-    </script>
+    <meta property="og:image" content="%SITE_URL%/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Revive Drip Haus: on-demand mobile IV hydration" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Revive Drip Haus | Mobile IV Hydration, Straight to You" />
+    <meta name="twitter:description" content="On-demand IV hydration across LA, Ventura &amp; OC. Open 24/7." />
+    <meta name="twitter:image" content="%SITE_URL%/og-image.jpg" />
+    <!-- render:jsonld -->
     <script>
       document.documentElement.classList.add('js');
     </script>
@@ -45,29 +42,22 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <!-- Loader ---------------------------------------------------------- -->
-    <div class="loader" aria-hidden="true">
-      <div class="loader__inner">
-        <span class="wordmark wordmark--xl">REV<b>IV</b>E<small>drip haus</small></span>
-        <span class="loader__bar"><span></span></span>
-      </div>
-    </div>
-
     <!-- The film: one WebGL canvas behind the whole page ----------------- -->
     <canvas class="film" id="film" aria-hidden="true"></canvas>
     <div class="film-fallback" aria-hidden="true"></div>
 
     <!-- Navigation ------------------------------------------------------- -->
     <header class="nav" id="nav">
-      <a class="brand" href="#top" aria-label="Revive Drip Haus, back to top">
+      <a class="brand" href="#top">
         <img class="brand__avatar" src="/media/nurse-avatar.png" alt="" width="123" height="139" />
-        <span class="wordmark">REV<b>IV</b>E<small>drip haus</small></span>
+        <span class="wordmark">REV<b>IV</b>E <small>drip haus</small></span>
+        <span class="sr-only">, back to top</span>
       </a>
       <nav class="nav__links" aria-label="Main">
         <a href="#about">About</a>
         <a href="#menu">IV Menu</a>
         <a href="#faq">FAQ</a>
-        <a href="./consent.html">Consent Form</a>
+        <a href="./consent-form">Consent Form</a>
         <a href="#contact">Contact</a>
       </nav>
       <a class="btn btn--primary btn--sm nav__cta" href="sms:+18184829426">Text to book</a>
@@ -81,7 +71,7 @@
         <a href="#about">About</a>
         <a href="#menu">IV Menu</a>
         <a href="#faq">FAQ</a>
-        <a href="./consent.html">Consent Form</a>
+        <a href="./consent-form">Consent Form</a>
         <a href="#contact">Contact</a>
       </nav>
       <div class="mobile-menu__foot">
@@ -91,10 +81,13 @@
     </div>
 
     <!-- Film HUD: scrolling is the play button --------------------------- -->
-    <aside class="hud" aria-label="Page chapters">
-      <div class="hud__state"><span class="hud__dot"></span><span class="hud__label">Scroll to play</span></div>
-      <div class="hud__time"><span data-hud-time>00:00</span><span class="hud__sep">/</span><span>01:00</span></div>
-      <ol class="hud__chapters">
+    <aside class="hud" aria-label="Animation controls and chapters">
+      <button class="hud__motion" type="button" data-motion-toggle aria-pressed="false">
+        <span class="hud__icon" aria-hidden="true"></span><span data-motion-label>Pause animation</span>
+      </button>
+      <div class="hud__state" aria-hidden="true"><span class="hud__dot"></span><span class="hud__label">Scroll to play</span></div>
+      <div class="hud__time" aria-hidden="true"><span data-hud-time>00:00</span><span class="hud__sep">/</span><span>01:00</span></div>
+      <ol class="hud__chapters" aria-label="Jump to chapter">
         <li><button type="button" data-goto="0"><span>01</span> Arrive</button></li>
         <li><button type="button" data-goto="1"><span>02</span> Travel</button></li>
         <li><button type="button" data-goto="2"><span>03</span> Absorb</button></li>
@@ -102,10 +95,10 @@
         <li><button type="button" data-goto="4"><span>05</span> Revive</button></li>
         <li><button type="button" data-goto="5"><span>06</span> Book</button></li>
       </ol>
-      <div class="hud__track"><span class="hud__fill"></span></div>
+      <div class="hud__track" aria-hidden="true"><span class="hud__fill"></span></div>
     </aside>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
       <!-- 01 · Hero ----------------------------------------------------- -->
       <section class="hero" id="top" data-chapter="0">
         <div class="hero__inner">
@@ -126,7 +119,7 @@
           </div>
         </div>
         <div class="hero__meta">
-          <span><i class="pulse"></i> Open 24/7</span>
+          <span><i class="pulse" aria-hidden="true"></i> Open 24/7</span>
           <span>Los Angeles · Ventura · Orange County</span>
         </div>
       </section>
@@ -157,7 +150,10 @@
               preload="none"
               aria-label="A client relaxes at home during an IV drip"
             ></video>
-            <figcaption><span class="pulse"></span> Your couch. Your schedule.</figcaption>
+            <figcaption><span class="pulse" aria-hidden="true"></span> Your couch. Your schedule.</figcaption>
+            <button class="video-toggle" type="button" data-video-toggle aria-label="Pause video" data-state="playing">
+              <span aria-hidden="true"></span>
+            </button>
           </figure>
           <ul class="stats" data-reveal-group>
             <li class="stat glass"><strong>24/7</strong><span>Open around the clock, including nights and weekends</span></li>
@@ -235,6 +231,7 @@
         </header>
 
         <div class="filters" role="group" aria-label="Filter drips"><!-- render:filters --></div>
+        <p class="sr-only" id="menu-status" role="status" aria-live="polite"></p>
 
         <div class="menu__grid" id="drip-grid"><!-- render:menu --></div>
 
@@ -250,7 +247,7 @@
 
       <!-- 05 · About (the orb) ------------------------------------------ -->
       <section class="about" id="about" data-chapter="4">
-        <p class="eyebrow">05 · Revive · About us</p>
+        <h2 class="eyebrow"><span aria-hidden="true">05 · Revive · </span>About us</h2>
         <p class="about__statement" data-scrub-words>
           At Revive Drip Haus, we bring hydration, wellness, and recovery directly to you, whenever and wherever.
         </p>
@@ -297,21 +294,26 @@
             <li><span>Hours</span>Open 24/7</li>
             <li><span>Serving</span>Los Angeles, Ventura &amp; Orange County</li>
             <li><span>Email</span><a href="mailto:info@revivedriphaus.com">Info@ReviveDripHaus.com</a></li>
-            <li><span>First visit?</span><a href="./consent.html">Fill out the consent form <!-- icon:arrow --></a></li>
+            <li><span>First visit?</span><a href="./consent-form">Fill out the consent form <!-- icon:arrow --></a></li>
           </ul>
+          <div class="areas">
+            <h3>Areas we serve</h3>
+            <!-- render:areas -->
+          </div>
         </div>
 
         <form class="form glass" data-form="contact" novalidate>
           <h3>Send a message</h3>
+          <p class="form__hint">Fields marked <span class="req" aria-hidden="true">*</span><span class="sr-only">with an asterisk</span> are required.</p>
           <div class="form__row">
-            <label>First name<input name="first_name" autocomplete="given-name" required /></label>
+            <label><span>First name <span class="req" aria-hidden="true">*</span></span><input name="first_name" autocomplete="given-name" required /></label>
             <label>Last name<input name="last_name" autocomplete="family-name" /></label>
           </div>
           <div class="form__row">
-            <label>Email<input name="email" type="email" autocomplete="email" required /></label>
+            <label><span>Email <span class="req" aria-hidden="true">*</span></span><input name="email" type="email" autocomplete="email" required /></label>
             <label>Phone<input name="phone" type="tel" autocomplete="tel" /></label>
           </div>
-          <label>Message<textarea name="message" rows="4" placeholder="Which drip, where, and when works for you?" required></textarea></label>
+          <label><span>Message <span class="req" aria-hidden="true">*</span></span><textarea name="message" rows="4" placeholder="Which drip, where, and when works for you?" required></textarea></label>
           <button class="btn btn--primary" type="submit">Send message <!-- icon:arrow --></button>
           <p class="form__status" role="status" aria-live="polite"></p>
         </form>
@@ -321,13 +323,13 @@
     <footer class="footer">
       <div class="footer__top">
         <div class="footer__brand">
-          <span class="wordmark wordmark--lg">REV<b>IV</b>E<small>drip haus</small></span>
+          <span class="wordmark wordmark--lg">REV<b>IV</b>E <small>drip haus</small></span>
           <p>Helping you achieve wellness.</p>
         </div>
         <nav class="footer__links" aria-label="Footer">
           <a href="#about">About</a>
           <a href="#menu">IV Menu</a>
-          <a href="./consent.html">Consent Form</a>
+          <a href="./consent-form">Consent Form</a>
           <a href="#contact">Contact</a>
         </nav>
         <form class="newsletter" data-form="newsletter" novalidate>
