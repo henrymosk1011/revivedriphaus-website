@@ -47,7 +47,7 @@ export class Splash {
     const surfGeo = new THREE.PlaneGeometry(400, 400, 1, 1);
     surfGeo.rotateX(-Math.PI / 2);
     const surfMat = new THREE.MeshPhysicalMaterial({
-      color: '#3fbf78',
+      color: '#a6e3c1',
       roughness: 0.06,
       clearcoat: 1,
       clearcoatRoughness: 0.05,
@@ -88,7 +88,7 @@ export class Splash {
       thickness: 0.12,
       ior: 1.34,
       attenuationColor: LIQUID_GREEN,
-      attenuationDistance: 0.22,
+      attenuationDistance: 0.1,
       envMapIntensity: 1.3,
       clearcoat: 1,
       side: THREE.DoubleSide,
@@ -165,6 +165,14 @@ export class Splash {
     this._m = new THREE.Matrix4();
     this._q = new THREE.Quaternion();
     this._s = new THREE.Vector3();
+  }
+
+  // A brighter studio for this world, so the pool reads as a pale, milky mint.
+  setEnvironment(env) {
+    for (const m of [this.surface, this.crown, this.droplets, this.jet, this.fallDrop.mesh, this.hoverDrop.mesh]) {
+      m.material.envMap = env;
+      m.material.needsUpdate = true;
+    }
   }
 
   // fall: 0→1 drop falls; s: 0→1 crown rises, 1→2 collapses; jet 0→1; hover 0→1

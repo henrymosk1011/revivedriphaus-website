@@ -58,8 +58,8 @@ export function initAnimations({ reduceMotion }) {
     );
   });
 
-  // "We come to you" holds while the drop forms and falls, then dissolves.
-  gsap.to('.drop__sticky', {
+  // "We come to you" dissolves as the video and stats arrive.
+  gsap.to('.drop__intro', {
     opacity: 0,
     y: -60,
     ease: 'none',

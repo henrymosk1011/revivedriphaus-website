@@ -13,6 +13,8 @@ export class Sky {
       uGlowDir: { value: new THREE.Vector3(0.2, 0.1, -1).normalize() },
       uGlowAmt: { value: 1.0 },
       uFluid: { value: 0 },
+      uSplash: { value: 0 },
+      uHaze: { value: new THREE.Color('#e9f1ec') },
       uDeep: { value: new THREE.Color('#032d18') },
       uShallow: { value: new THREE.Color('#33c97a') },
     };
@@ -27,8 +29,8 @@ export class Sky {
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
       fragmentShader: /* glsl */ `
-        uniform float uTime, uGlowAmt, uFluid;
-        uniform vec3 uTop, uBottom, uGlow, uGlowDir, uDeep, uShallow;
+        uniform float uTime, uGlowAmt, uFluid, uSplash;
+        uniform vec3 uTop, uBottom, uGlow, uGlowDir, uDeep, uShallow, uHaze;
         varying vec3 vDir;
         ${snoise}
         // Light caustics, the dancing net of light at the bottom of a pool.
@@ -54,6 +56,11 @@ export class Sky {
           float g = max(dot(d, normalize(uGlowDir)), 0.0);
           studio += uGlow * (pow(g, 3.0) * 0.35 + pow(g, 12.0) * 0.25) * uGlowAmt;
           studio *= 1.0 - 0.18 * smoothstep(0.3, 1.0, abs(d.x));
+          // splash world: a seamless white-mint sweep. At and below the horizon it
+          // is exactly the fog colour, so the liquid surface melts into it.
+          vec3 haze = mix(uHaze, uTop, smoothstep(0.0, 0.6, d.y));
+          haze += uGlow * pow(g, 3.0) * 0.16 * smoothstep(0.02, 0.4, d.y);
+          studio = mix(studio, haze, uSplash);
           // underwater
           vec3 water = mix(uDeep, uShallow, smoothstep(-0.6, 0.9, d.y));
           vec2 cuv = d.xz / (abs(d.y) + 0.6) * 0.6;

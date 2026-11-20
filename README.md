@@ -12,7 +12,7 @@ Scrolling is the play button. Each page section is a chapter, and the camera eas
 | 02 Drop | "We come to you" | Macro shot inside the drip chamber: a drop swells at the tip, falls, and splashes into the pool |
 | 03 Line | Benefits | The camera follows the fluid as it fills the clear IV line, past the Y-site and roller clamp |
 | 04 Formula | IV menu | A dive into the fluid itself: light shafts, bubbles and the vitamin and mineral molecules in each drip |
-| 05 Revive | About | Back out through the surface, a single drop lands: a crown splash in bullet time |
+| 05 Revive | About | Back out through the surface into a white studio, a single drop lands in a pale mint pool: an emerald crown splash in bullet time |
 | 06 Book | FAQ + contact | A jet rises and releases one perfect drop, which hovers beside the booking details |
 
 The IV menu cards are styled as IV bags too: a hanger tab, a frosted bag whose fluid level fills when the card appears, a printed label with the drip's details, and a port at the bottom.
@@ -55,7 +55,7 @@ What's built in:
 
 - **Motion control:** a "Pause animation" button (bottom left) freezes the ambient 3D animation, transition flashes, CSS animations and the looping video. It's remembered between visits, and it's on by default when the visitor's device asks for reduced motion. Scrolling still moves the story, because the visitor controls that.
 - **Flashes:** none. Scene changes are a slow liquid wipe (a waterline sweeping across the frame), not a flash.
-- **Contrast:** a soft field of light runs in from the left behind every block of copy that floats over the 3D film (a dark one in the underwater menu chapter), and the nav, HUD, buttons and cards have solid or frosted backings.
+- **Contrast:** copy that floats on the 3D film carries a soft glow that hugs each letter (light on the studio scenes, dark in the underwater menu chapter). It's invisible on plain backgrounds and only shows where a dark object passes behind the text, so there are no boxes or panels behind the copy. The nav, HUD, buttons and cards have solid or frosted backings.
 - **Keyboard:**
   - Skip link to the main content, and visible focus rings throughout.
   - In-page links move keyboard focus to the section they jump to.
@@ -76,7 +76,7 @@ What's built in:
 How it was verified:
 
 - axe-core (WCAG 2.0/2.1/2.2 A and AA, plus best practices) reports 0 violations on the homepage, consent form and 404 page, at desktop and phone sizes.
-- axe can't judge text over a WebGL canvas, so contrast was measured from rendered pixels at 17 moments of the film, at desktop and phone sizes: every text sample passes AA (lines partly scrolled under the fixed nav or HUD are skipped).
+- axe can't judge text over a WebGL canvas, so contrast was measured from rendered pixels, directly behind each letter, at 17–19 moments of the film at 1920, 1440 and phone widths: every text sample passes AA (lines partly scrolled under the fixed nav or HUD are skipped).
 - 19 scripted keyboard and screen-reader behaviour checks pass.
 
 Re-run the audits after changes (they need Playwright with Chromium installed, and the preview server running via `npm run build && npm run preview`):

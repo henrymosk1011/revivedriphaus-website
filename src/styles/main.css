@@ -19,9 +19,12 @@
   --line-2: rgba(10, 36, 22, 0.24);
   --glass: rgba(255, 255, 255, 0.66);
   --glass-strong: rgba(255, 255, 255, 0.84);
-  --scrim: rgba(240, 246, 242, 0.76);
   --radius: 26px;
   --radius-sm: 14px;
+  /* a soft glow that hugs each letter: invisible on the light studio, it keeps
+     copy readable when a dark object in the film passes behind it */
+  --halo: 0 0 1px #f2f6f3, 0 0 3px rgba(242, 246, 243, 0.9), 0 0 8px rgba(242, 246, 243, 0.7),
+    0 0 18px rgba(242, 246, 243, 0.45);
   --gutter: clamp(20px, 4.5vw, 64px);
   --max: 1280px;
 
@@ -36,11 +39,11 @@
 /* The underwater "formula" chapter flips to light-on-dark. */
 [data-theme='dark'] {
   --ink: #effaf3;
-  --ink-2: rgba(239, 250, 243, 0.88);
-  --ink-3: rgba(239, 250, 243, 0.74);
+  --ink-2: #d9eadf;
+  --ink-3: #bcd2c4;
   --line: rgba(239, 250, 243, 0.2);
   --line-2: rgba(239, 250, 243, 0.34);
-  --scrim: rgba(3, 38, 20, 0.72);
+  --halo: 0 0 1px #032614, 0 0 3px #032614, 0 0 8px rgba(3, 38, 20, 0.8), 0 0 18px rgba(3, 38, 20, 0.5);
   color: var(--ink);
 }
 
@@ -155,6 +158,9 @@ a {
 .hero__title em {
   font-style: italic;
   color: var(--forest);
+}
+[data-theme='dark'] .tag {
+  color: var(--ink);
 }
 [data-theme='dark'] .display em {
   color: #8ff0b8;
@@ -625,31 +631,18 @@ section {
   color: var(--ink);
 }
 
-/* A soft field of light behind copy that floats on the film, so contrast holds
-   whatever the film shows. It runs in from the left edge of the screen and
-   fades out past the text, like light falling across the set. */
-.scrim {
-  position: relative;
-  isolation: isolate;
+/* Copy that floats directly on the film carries the letter halo. */
+.hero__text,
+.spec,
+.drop__intro,
+.section-head,
+.about__inner,
+.contact__intro {
+  text-shadow: var(--halo);
 }
-.scrim::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  top: -56px;
-  bottom: -56px;
-  left: -100vw;
-  right: -240px;
-  pointer-events: none;
-  background: linear-gradient(90deg, var(--scrim) 0, var(--scrim) calc(100% - 220px), transparent);
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
-  mask-image: linear-gradient(180deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
-}
-/* the opening shot is already bright: keep the bag untouched */
-@media (min-width: 821px) {
-  .hero .scrim::before {
-    display: none;
-  }
+.btn,
+.btn * {
+  text-shadow: none;
 }
 
 /* ---------- 01 The bag (hero) --------------------------------------------- */
@@ -706,23 +699,6 @@ section {
 .spec div {
   padding-top: 12px;
 }
-/* the studio floor darkens behind the spec strip: same light field as .scrim */
-.spec {
-  isolation: isolate;
-}
-.spec::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  top: -40px;
-  bottom: -40px;
-  left: -100vw;
-  right: -200px;
-  pointer-events: none;
-  background: linear-gradient(90deg, var(--scrim) 0, var(--scrim) calc(100% - 180px), transparent);
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 40px, #000 calc(100% - 40px), transparent);
-  mask-image: linear-gradient(180deg, transparent, #000 40px, #000 calc(100% - 40px), transparent);
-}
 .spec dt {
   font: 500 11px/1.4 var(--f-mono);
   letter-spacing: 0.14em;
@@ -744,9 +720,8 @@ section {
 .drop {
   padding-bottom: 14vh;
 }
-.drop__sticky {
-  position: sticky;
-  top: 0;
+.drop__intro {
+  position: relative;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -755,7 +730,7 @@ section {
   margin: 0 auto;
   padding: 110px 0 60px;
 }
-.drop__sticky > * {
+.drop__intro > * {
   max-width: 560px;
 }
 .drop__copy {
@@ -766,7 +741,7 @@ section {
 }
 .drop__lower {
   max-width: var(--max);
-  margin: 60vh auto 0;
+  margin: 46vh auto 0;
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   gap: 20px;
@@ -1607,6 +1582,15 @@ section {
 
 /* ---------- Footer -------------------------------------------------------- */
 
+main::after {
+  content: '';
+  display: block;
+  height: 220px;
+  margin-top: -60px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(10, 36, 22, 0) 0%, rgba(10, 36, 22, 0.55) 55%, #0a2416 100%);
+}
+
 .footer {
   position: relative;
   z-index: 1;
@@ -1952,7 +1936,7 @@ html.motion-paused *::after {
     justify-content: flex-end;
     padding-bottom: 92px;
   }
-  .drop__sticky {
+  .drop__intro {
     justify-content: flex-end;
     padding-bottom: 96px;
   }
@@ -2011,16 +1995,6 @@ html.motion-paused *::after {
   .hud__bar {
     left: 12px;
     bottom: calc(12px + env(safe-area-inset-bottom));
-  }
-  /* on phones the film sits behind the copy: full-width bands */
-  .scrim::before {
-    top: -32px;
-    bottom: -32px;
-    left: calc(-1 * var(--gutter));
-    right: calc(-1 * var(--gutter));
-    background: var(--scrim);
-    -webkit-mask-image: linear-gradient(180deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
-    mask-image: linear-gradient(180deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
   }
 }
 

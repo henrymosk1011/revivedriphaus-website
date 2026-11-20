@@ -75,6 +75,7 @@ export class Film {
     this.line = new Line({ quality: this.quality });
     this.fluid = new FluidWorld({ quality: this.quality });
     this.splash = new Splash({ quality: this.quality });
+    this.splash.setEnvironment(createEnvironment(renderer, { room: '#e2ebe5', floor: '#bfeccf', floorIntensity: 1 }));
     scene.add(this.sky.mesh, this.bag.group, this.line.group, this.fluid.group, this.splash.group);
 
     const key = new THREE.DirectionalLight('#ffffff', 1.3);
@@ -128,7 +129,7 @@ export class Film {
     const shot1 = () => {
       const k = [
         { t: 0.0, p: V(0.0, 0.2, this.wide ? 8.4 : 11.5), l: V(0, -0.12, 0), shift: S(), fov: 34 },
-        { t: 0.5, p: V(-1.7, 0.1, 6.4), l: V(0, -0.4, 0), shift: S() * 0.9, fov: 34 },
+        { t: 0.5, p: this.wide ? V(-1.7, 0.1, 6.4) : V(-1.4, 0.2, 11), l: V(0, this.wide ? -0.4 : -0.12, 0), shift: S() * 0.9, fov: 34 },
         { t: 0.92, p: V(0.25, -1.7, 3.4), l: V(0, -2.35, 0), shift: S() * 0.9, fov: 32 },
         // macro: the drop forms at the tip, falls and lands
       ];
@@ -187,15 +188,15 @@ export class Film {
       const o = (x, y, z) => O.clone().add(V(x, y, z));
       return new Shot([
         { t: T_SURFACE, p: o(0, 2.2, 7.4), l: o(0, 1.9, 0), shift: 0, fov: 36 },
-        { t: 4.12, p: o(0.4, 1.6, 6.6), l: o(0, 1.1, 0), shift: 0, fov: 36 },
-        { t: 4.3, p: o(1.8, 1.2, 5.6), l: o(0, 0.6, 0), shift: 0, fov: 36 },
+        { t: 4.12, p: o(0.4, 1.6, 7.2), l: o(0, 1.0, 0), shift: S() * 0.9, fov: 36 },
+        { t: 4.3, p: o(2.0, 1.25, 6.4), l: o(0, 0.6, 0), shift: S() * 0.9, fov: 36 },
         // bullet time: orbit the frozen crown
-        { t: 4.55, p: o(4.6, 1.5, 2.4), l: o(0, 0.65, 0), shift: 0, fov: 36 },
-        { t: 4.8, p: o(3.4, 2.0, -3.8), l: o(0, 0.6, 0), shift: 0, fov: 36 },
-        { t: 5.0, p: o(-2.6, 1.7, -4.4), l: o(0, 0.6, 0), shift: 0, fov: 36 },
-        { t: 5.25, p: o(-3.3, 1.15, 1.2), l: o(0, 0.75, 0), shift: S() * 0.5, fov: 36 },
-        { t: 5.55, p: o(-2.0, 1.4, 4.2), l: o(0, 1.15, 0), shift: S(), fov: 34 },
-        { t: 6.0, p: o(0, 1.45, 4.4), l: o(0, 1.2, 0), shift: S(), fov: 34 },
+        { t: 4.55, p: o(5.5, 1.6, 2.9), l: o(0, 0.6, 0), shift: S() * 0.9, fov: 36 },
+        { t: 4.8, p: o(4.1, 2.1, -4.6), l: o(0, 0.55, 0), shift: S() * 0.9, fov: 36 },
+        { t: 5.0, p: o(-3.1, 1.8, -5.3), l: o(0, 0.55, 0), shift: S() * 0.9, fov: 36 },
+        { t: 5.25, p: o(-3.9, 1.2, 1.4), l: o(0, 0.75, 0), shift: S() * 0.9, fov: 36 },
+        { t: 5.55, p: o(-2.2, 1.4, 4.6), l: o(0, 1.15, 0), shift: S() * 0.9, fov: 34 },
+        { t: 6.0, p: o(0, 1.45, 4.8), l: o(0, 1.2, 0), shift: S() * 0.9, fov: 34 },
       ]);
     };
 
@@ -284,16 +285,23 @@ export class Film {
     cam.aspect = this.aspect;
     cam.updateProjectionMatrix();
     cam.projectionMatrix.elements[8] -= shot.shift * 2;
-    // phones: lift the bag, then the drop, above the copy
-    if (!this.wide) cam.projectionMatrix.elements[9] -= 2 * (0.25 * (1 - smooth(0.6, 0.95, T)) + 0.2 * macro);
+    // phones: the bag sits above the headline and scrolls away with it, then
+    // the drop is lifted above the copy
+    if (!this.wide) {
+      const heroLift = (0.25 + 0.55 * Math.min(T / 0.6, 1)) * (1 - smooth(0.6, 0.95, T));
+      cam.projectionMatrix.elements[9] -= 2 * (heroLift + 0.2 * macro);
+    }
     cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert();
 
     // --- Worlds -------------------------------------------------------------
     const inFluid = T >= T_IN[1] && T < T_SURFACE;
+    const inSplash = T >= T_SURFACE;
     this.sky.uniforms.uFluid.value = inFluid ? 1 : 0;
+    this.sky.uniforms.uSplash.value = inSplash ? 1 : 0;
     this.sky.update(cam, t);
-    this.scene.fog.color.set(inFluid ? '#0b4a28' : '#e3ede7');
-    this.scene.fog.density = inFluid ? 0.022 : T >= T_SURFACE ? 0.03 : 0;
+    if (inFluid) this.scene.fog.color.set('#0b4a28');
+    else this.scene.fog.color.copy(this.sky.uniforms.uHaze.value);
+    this.scene.fog.density = inFluid ? 0.022 : inSplash ? 0.04 : 0;
     this.hemi.color.set(inFluid ? '#c9ffe0' : '#ffffff');
     this.hemi.groundColor.set(inFluid ? '#0b5a30' : '#3fbf7a');
 
@@ -360,6 +368,8 @@ export class Film {
     }
     fu.uWipeLevel.value = level;
     fu.uWipeTint.value = tint;
+    // a gentle vignette on the bright studio scenes, a deeper one underwater
+    fu.uVignette.value = inFluid ? 0.28 : 0.14;
     fu.uTime.value = t;
   }
 

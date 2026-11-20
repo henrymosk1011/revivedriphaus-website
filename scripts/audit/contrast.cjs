@@ -5,7 +5,7 @@ const { PNG } = require('pngjs');
 (async () => {
   const [mode, list, path = '/?capture'] = process.argv.slice(2);
   const Ts = list.split(',').map(Number);
-  const vp = mode === 'mobile' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
+  const vp = mode === 'mobile' ? { width: 390, height: 844 } : mode === 'wide' ? { width: 1920, height: 1080 } : { width: 1440, height: 900 };
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: vp, deviceScaleFactor: 1, isMobile: mode === 'mobile', hasTouch: mode === 'mobile' });
   await p.goto((process.env.BASE_URL || 'http://localhost:4173') + path, { waitUntil: 'load' });
@@ -58,17 +58,27 @@ const { PNG } = require('pngjs');
       }
       return out;
     });
-    // hide every glyph, keep backgrounds, then photograph what's behind the text
-    await p.addStyleTag({ content: '*{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important;caret-color:transparent!important} *::placeholder{color:transparent!important}' }).then((h) => p.evaluate((n) => n.id = 'hide-text', h));
+    // Photograph what sits behind each glyph: hide the glyph fill but keep any
+    // text-shadow halo (WCAG measures text against its halo when it has one),
+    // then take a second shot with glyphs in magenta to find glyph pixels.
+    const hideFill = await p.addStyleTag({ content: '*{color:transparent!important;-webkit-text-fill-color:transparent!important;caret-color:transparent!important} *::placeholder{color:transparent!important}' });
     const png = PNG.sync.read(await p.screenshot());
-    await p.evaluate(() => document.getElementById('hide-text')?.remove());
+    await hideFill.evaluate((n) => n.remove());
+    const magenta = await p.addStyleTag({ content: '*{color:#ff00ff!important;-webkit-text-fill-color:#ff00ff!important;text-shadow:none!important} *::placeholder{color:#ff00ff!important}' });
+    const mask = PNG.sync.read(await p.screenshot());
+    await magenta.evaluate((n) => n.remove());
     for (const it of items) {
       const [x0, y0, x1, y1] = it.rect.map(Math.round);
       const lums = [];
       let worst = null; let worstL = -1;
-      for (let y = y0; y < y1; y += 2) for (let x = x0; x < x1; x += 2) {
-        const i = (y * png.width + x) * 4; const L = lum(png.data[i], png.data[i + 1], png.data[i + 2]);
-        lums.push(L); if (L > worstL) { worstL = L; worst = [png.data[i], png.data[i + 1], png.data[i + 2]]; }
+      const glyph = (i) => mask.data[i] > 200 && mask.data[i + 1] < 70 && mask.data[i + 2] > 200;
+      for (let pass = 0; pass < 2 && !lums.length; pass++) {
+        for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+          const i = (y * png.width + x) * 4;
+          if (pass === 0 && !glyph(i)) continue; // pass 1: no glyph pixels found, use the whole box
+          const L = lum(png.data[i], png.data[i + 1], png.data[i + 2]);
+          lums.push(L); if (L > worstL) { worstL = L; worst = [png.data[i], png.data[i + 1], png.data[i + 2]]; }
+        }
       }
       if (!lums.length) continue;
       lums.sort((a, b) => a - b);
