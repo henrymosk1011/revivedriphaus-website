@@ -130,6 +130,10 @@ src/scene/Splash.js        crown splash, jet and hovering drop
 src/scene/*.js             Droplet, Molecules, Sky, environment, FinalShader
 ```
 
+## The old site
+
+The old Webflow site was archived in [`legacy-site/`](legacy-site/README.md) before it went offline: every page's copy, full-page screenshots, the raw HTML and stylesheet, and the original photos, logo and video. Check there for anything the old site said or showed.
+
 ## Content to confirm with the client
 
 These were fixed or rewritten from the live site and are marked `REVIEW` in `content.js`:
